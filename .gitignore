@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.db
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Environment files
+.env
+
+# OS junk
+.DS_Store
+Thumbs.db
