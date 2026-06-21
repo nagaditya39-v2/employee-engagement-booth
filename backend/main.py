@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 import uuid
@@ -42,3 +42,22 @@ def get_qr_code(qr_code: str):
     buffer.seek(0)
 
     return StreamingResponse(buffer, media_type="image/png")
+
+@app.get("/resume/{qr_code}", response_model=schemas.UserOut)
+def resume_user(qr_code: str, db: Session = Depends(get_db)):
+
+    user = db.query(models.Users).filter(models.Users.qr_code == qr_code).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return user
+
+@app.get("/users/{user_id}", response_model=schemas.UserOut)
+def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Users).filter(models.Users.id == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return user
