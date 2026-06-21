@@ -66,3 +66,45 @@ def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
 @app.get("/content", response_model=List[schemas.ContentItemOut])
 def get_all_content(db: Session = Depends(get_db)):
     return db.query(models.ContentItems).all()
+
+@app.post("/content/{content_id}/view", response_model=schemas.ProgressOut)
+def mark_content_viewed(content_id: int, user_id: int, db: Session = Depends(get_db)):
+    progress = db.query(models.Progress).filter(models.Progress.user_id == user_id, models.Progress.content_id == content_id).first()
+
+    if not progress:
+        new_progress = models.Progress(
+            user_id = user_id,
+            content_id = content_id,
+            status = "viewed"
+        )
+
+        db.add(new_progress)
+        db.commit()
+        db.refresh(new_progress)
+
+        return new_progress
+    else:
+        return progress
+
+@app.get("/progress/{user_id}", response_model=List[schemas.ProgressOut])
+def get_user_progress(user_id: int, db: Session = Depends(get_db)):
+    all_content = db.query(models.ContentItems).all()
+    existing_progress = db.query(models.Progress).filter(models.Progress.user_id == user_id).all()
+
+    # lookup
+    progress_by_content_id = {p.content_id: p for p in existing_progress}
+
+    result = []
+    for content in all_content:
+        if content.id in progress_by_content_id:
+            result.append(progress_by_content_id[content.id])
+        else:
+            result.append(models.Progress(
+                id=0,
+                user_id=user_id,
+                content_id=content.id,
+                status="not_started",
+                score_till_now=0
+            ))
+
+    return result
