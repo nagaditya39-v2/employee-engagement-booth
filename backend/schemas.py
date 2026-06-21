@@ -15,3 +15,13 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
+    
+class ContentItemOut(BaseModel):
+    id: int
+    title: str
+    content_type: str
+    url: str
+    number_of_questions: int
+
+    class Config:
+        from_attributes = True

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from typing import List
 import uuid
 import qrcode
 import io
@@ -61,3 +62,7 @@ def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
 
     return user
+
+@app.get("/content", response_model=List[schemas.ContentItemOut])
+def get_all_content(db: Session = Depends(get_db)):
+    return db.query(models.ContentItems).all()
