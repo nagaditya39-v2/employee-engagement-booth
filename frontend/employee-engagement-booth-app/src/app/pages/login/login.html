@@ -1,0 +1,28 @@
+<div class="login-container">
+  <h1>Employee Engagement Booth</h1>
+
+  <div class="card">
+    <h2>Register</h2>
+    <input
+      type="text"
+      placeholder="Enter your name"
+      [(ngModel)]="name"
+      (keyup.enter)="register()"
+    />
+    <button (click)="register()" [disabled]="!name.trim()">Register</button>
+  </div>
+
+  <div class="divider">— or —</div>
+
+  <div class="card">
+    <h2>Resume Session</h2>
+    <input
+      type="number"
+      placeholder="Enter your user ID"
+      [(ngModel)]="userId"
+    />
+    <button (click)="resumeById()" [disabled]="!userId">Resume</button>
+  </div>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+</div>

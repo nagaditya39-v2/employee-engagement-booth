@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+
 from sqlalchemy.orm import Session
 from typing import List
 import uuid
@@ -12,6 +14,13 @@ import schemas
 from config import HOST_URL
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root_url():
@@ -44,15 +53,61 @@ def get_qr_code(qr_code: str):
 
     return StreamingResponse(buffer, media_type="image/png")
 
-@app.get("/resume/{qr_code}", response_model=schemas.UserOut)
+@app.get("/resume/{qr_code}", response_model=schemas.UserFullOut)
 def resume_user(qr_code: str, db: Session = Depends(get_db)):
-
     user = db.query(models.Users).filter(models.Users.qr_code == qr_code).first()
-
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return user
+    # Build progress list (all 4 items, synthesize not_started for untouched ones)
+    all_content = db.query(models.ContentItems).all()
+    existing_progress = db.query(models.Progress).filter(models.Progress.user_id == user.id).all()
+    progress_by_content_id = {p.content_id: p for p in existing_progress}
+
+    progress_list = []
+    for content in all_content:
+        if content.id in progress_by_content_id:
+            p = progress_by_content_id[content.id]
+            progress_list.append(schemas.ProgressSummary(
+                content_id=p.content_id,
+                status=p.status,
+                score_till_now=p.score_till_now
+            ))
+        else:
+            progress_list.append(schemas.ProgressSummary(
+                content_id=content.id,
+                status="not_started",
+                score_till_now=0
+            ))
+
+    # Build assigned questions list (only for content already quizzed)
+    attempts = db.query(models.QuizAttempts, models.QuizQuestions).join(
+        models.QuizQuestions, models.QuizAttempts.question_id == models.QuizQuestions.id
+    ).filter(models.QuizAttempts.user_id == user.id).all()
+
+    assigned_questions = []
+    for attempt, question in attempts:
+        assigned_questions.append(schemas.AssignedQuestionOut(
+            question_id=question.id,
+            content_id=attempt.content_id,
+            question_text=question.question_text,
+            option_a=question.option_a,
+            option_b=question.option_b,
+            option_c=question.option_c,
+            option_d=question.option_d,
+            selected_option=attempt.selected_option,
+            answered_at=attempt.answered_at
+        ))
+
+    return schemas.UserFullOut(
+        id=user.id,
+        name=user.name,
+        qr_code=user.qr_code,
+        total_score=user.total_score,
+        created_date=user.created_date,
+        progress=progress_list,
+        assigned_questions=assigned_questions
+    )
 
 @app.get("/users/{user_id}", response_model=schemas.UserOut)
 def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
