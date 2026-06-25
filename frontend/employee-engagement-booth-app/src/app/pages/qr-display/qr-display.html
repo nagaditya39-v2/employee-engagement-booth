@@ -1,0 +1,8 @@
+<div class="qr-container">
+  <h2>You're registered!</h2>
+  <p>Your ID: <strong>{{ userId }}</strong></p>
+  <p>Screenshot this QR code — you'll need it to resume your session on any kiosk.</p>
+  <img [src]="qrImageUrl" alt="Your QR Code" />
+  <p class="token">{{ qrCode }}</p>
+  <button (click)="goToMenu()">Continue to Menu →</button>
+</div>

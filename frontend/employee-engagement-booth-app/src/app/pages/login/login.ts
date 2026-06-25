@@ -25,8 +25,8 @@ export class Login {
       return;
     }
     this.api.register(this.name.trim()).subscribe({
-      next: (user) => {
-        this.router.navigate(['/menu', user.id]);
+      next: (user: any) => {
+        this.router.navigate(['/qr', user.id, user.qr_code]);
       },
       error: () => {
         this.errorMessage = 'Registration failed. Please try again.';

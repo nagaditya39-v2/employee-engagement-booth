@@ -1,1 +1,15 @@
-<p>menu works!</p>
+<div class="menu-container">
+  <h2>Welcome! Choose a topic to explore.</h2>
+
+  <div class="content-grid">
+    <div
+      class="content-card"
+      *ngFor="let item of contentItems"
+      (click)="openContent(item)"
+    >
+      <div class="card-type">{{ item.content_type }}</div>
+      <h3>{{ item.title }}</h3>
+      <div class="card-status">{{ getStatusLabel(item.id) }}</div>
+    </div>
+  </div>
+</div>
