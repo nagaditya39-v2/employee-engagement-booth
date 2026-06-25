@@ -1,1 +1,18 @@
-<p>leaderboard works!</p>
+<div class="leaderboard-container">
+  <h1>🏆 Leaderboard</h1>
+  <p class="status" *ngIf="!connected">Connecting...</p>
+
+  <div class="standings" *ngIf="standings.length > 0">
+    <div class="row" *ngFor="let user of standings; let i = index">
+      <span class="rank">
+        {{ i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1) }}
+      </span>
+      <span class="name">{{ user.name }}</span>
+      <span class="score">{{ user.score }} pts</span>
+    </div>
+  </div>
+
+  <p class="empty" *ngIf="connected && standings.length === 0">
+    No scores yet — be the first!
+  </p>
+</div>

@@ -1,0 +1,33 @@
+<div class="quiz-container">
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <ng-container *ngIf="!result && currentQuestion">
+    <p class="progress">Question {{ currentIndex + 1 }} of {{ questions.length }}</p>
+    <h2>{{ currentQuestion.question_text }}</h2>
+
+    <div class="options">
+      <button
+        *ngFor="let opt of ['a','b','c','d']"
+        [class.selected]="selectedOption === opt"
+        (click)="selectOption(opt)"
+      >
+        {{ currentQuestion['option_' + opt] }}
+      </button>
+    </div>
+
+    <button
+      class="submit-btn"
+      [disabled]="!selectedOption || submitting"
+      (click)="submitAnswer()"
+    >
+      {{ submitting ? 'Submitting...' : (currentIndex === questions.length - 1 ? 'Finish Quiz' : 'Next') }}
+    </button>
+  </ng-container>
+
+  <div class="result" *ngIf="result">
+    <h2>🎉 Quiz Complete!</h2>
+    <p>You earned <strong>{{ result.score_earned }}</strong> points.</p>
+    <p>Total score: <strong>{{ result.total_score }}</strong></p>
+    <p class="redirecting">Returning to login...</p>
+  </div>
+</div>

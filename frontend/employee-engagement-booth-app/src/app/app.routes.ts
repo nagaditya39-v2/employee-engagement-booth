@@ -3,6 +3,7 @@ import { Login } from './pages/login/login';
 import { Menu } from './pages/menu/menu';
 import { Leaderboard } from './pages/leaderboard/leaderboard';
 import { QrDisplay } from './pages/qr-display/qr-display';
+import { Quiz } from './pages/quiz/quiz';
 
 
 export const routes: Routes = [
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'menu/:userId', component: Menu },
   { path: 'leaderboard', component: Leaderboard },
   { path: 'qr/:userId/:qrCode', component: QrDisplay },
+  { path: 'quiz/:userId/:contentId', component: Quiz },
 
 ];

@@ -1,27 +1,56 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 from typing import List
-import uuid
-import qrcode
-import io
+
+import uuid, qrcode, io, random, models, schemas
 
 from database import get_db
-import models
-import schemas
 from config import HOST_URL
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
+    allow_origins=["http://localhost:4200", "http://127.0.0.1:4200", "*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
 
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, data: dict):
+        for connection in self.active_connections:
+            await connection.send_json(data)
+
+manager = ConnectionManager()
+
+
+@app.websocket("/ws/leaderboard")
+async def leaderboard_ws(websocket: WebSocket, db: Session = Depends(get_db)):
+    await manager.connect(websocket)
+    try:
+        # Send current standings immediately on connect
+        users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
+        standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in users]
+        await websocket.send_json(standings)
+
+        # Keep connection alive, wait for client to disconnect
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        
 @app.get("/")
 def root_url():
     return {"message": "you've come to the root page"}
@@ -173,3 +202,174 @@ def test_display():
         </body>
         </html>
     """)
+
+@app.post("/content/{content_id}/start-quiz", response_model=List[schemas.AssignedQuestionOut])
+def start_quiz(content_id: int, user_id: int, db: Session = Depends(get_db)):
+    content = db.query(models.ContentItems).filter(models.ContentItems.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="Content item not found")
+
+    user = db.query(models.Users).filter(models.Users.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # If already assigned, return existing attempts instead of rerolling
+    existing_attempts = db.query(models.QuizAttempts, models.QuizQuestions).join(
+        models.QuizQuestions, models.QuizAttempts.question_id == models.QuizQuestions.id
+    ).filter(
+        models.QuizAttempts.user_id == user_id,
+        models.QuizAttempts.content_id == content_id
+    ).all()
+
+    if existing_attempts:
+        return [
+            schemas.AssignedQuestionOut(
+                question_id=q.id,
+                content_id=content_id,
+                question_text=q.question_text,
+                option_a=q.option_a,
+                option_b=q.option_b,
+                option_c=q.option_c,
+                option_d=q.option_d,
+                selected_option=a.selected_option,
+                answered_at=a.answered_at
+            )
+            for a, q in existing_attempts
+        ]
+
+    # Draw fresh questions from the pool
+    pool = db.query(models.QuizQuestions).filter(models.QuizQuestions.content_id == content_id).all()
+    if not pool:
+        raise HTTPException(status_code=400, detail="No questions available for this content item")
+
+    draw_count = min(content.number_of_questions, len(pool))
+    drawn = random.sample(pool, draw_count)
+
+    assigned = []
+    for q in drawn:
+        attempt = models.QuizAttempts(
+            user_id=user_id,
+            content_id=content_id,
+            question_id=q.id,
+            selected_option=None,
+            is_correct=None
+        )
+        db.add(attempt)
+        assigned.append(q)
+
+    # Lock the quiz in Progress
+    progress = db.query(models.Progress).filter(
+        models.Progress.user_id == user_id,
+        models.Progress.content_id == content_id
+    ).first()
+
+    if progress:
+        progress.status = "quiz_assigned"
+    else:
+        progress = models.Progress(
+            user_id=user_id,
+            content_id=content_id,
+            status="quiz_assigned",
+            score_till_now=0
+        )
+        db.add(progress)
+
+    db.commit()
+
+    return [
+        schemas.AssignedQuestionOut(
+            question_id=q.id,
+            content_id=content_id,
+            question_text=q.question_text,
+            option_a=q.option_a,
+            option_b=q.option_b,
+            option_c=q.option_c,
+            option_d=q.option_d,
+            selected_option=None,
+            answered_at=None
+        )
+        for q in assigned
+    ]
+
+
+@app.post("/quiz/answer", response_model=schemas.AssignedQuestionOut)
+def answer_question(payload: schemas.AnswerSubmit, db: Session = Depends(get_db)):
+    attempt = db.query(models.QuizAttempts).filter(
+        models.QuizAttempts.user_id == payload.user_id,
+        models.QuizAttempts.question_id == payload.question_id
+    ).first()
+
+    if not attempt:
+        raise HTTPException(status_code=404, detail="Quiz attempt not found — question wasn't assigned to this user")
+
+    if attempt.answered_at is not None:
+        raise HTTPException(status_code=400, detail="Question already answered")
+
+    question = db.query(models.QuizQuestions).filter(models.QuizQuestions.id == payload.question_id).first()
+    if not question:
+        raise HTTPException(status_code=404, detail="Question not found")
+
+    attempt.selected_option = payload.selected_option
+    attempt.is_correct = (payload.selected_option == question.correct_option)
+    attempt.answered_at = func.now()
+
+    db.commit()
+    db.refresh(attempt)
+
+    return schemas.AssignedQuestionOut(
+        question_id=question.id,
+        content_id=attempt.content_id,
+        question_text=question.question_text,
+        option_a=question.option_a,
+        option_b=question.option_b,
+        option_c=question.option_c,
+        option_d=question.option_d,
+        selected_option=attempt.selected_option,
+        answered_at=attempt.answered_at
+    )
+
+
+@app.post("/quiz/submit", response_model=schemas.QuizResult)
+async def submit_quiz(user_id: int, content_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Users).filter(models.Users.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    attempts = db.query(models.QuizAttempts, models.QuizQuestions).join(
+        models.QuizQuestions, models.QuizAttempts.question_id == models.QuizQuestions.id
+    ).filter(
+        models.QuizAttempts.user_id == user_id,
+        models.QuizAttempts.content_id == content_id
+    ).all()
+
+    if not attempts:
+        raise HTTPException(status_code=400, detail="No quiz assigned for this user/content")
+
+    unanswered = [a for a, q in attempts if a.answered_at is None]
+    if unanswered:
+        raise HTTPException(status_code=400, detail=f"{len(unanswered)} question(s) still unanswered")
+
+    score_earned = sum(q.points for a, q in attempts if a.is_correct)
+
+    progress = db.query(models.Progress).filter(
+        models.Progress.user_id == user_id,
+        models.Progress.content_id == content_id
+    ).first()
+    progress.status = "quiz_completed"
+    progress.score_till_now = score_earned
+
+    user.total_score = (user.total_score or 0) + score_earned
+
+    db.commit()
+
+    # Broadcast updated standings to leaderboard
+    all_users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
+    standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in all_users]
+    await manager.broadcast(standings)
+
+    return schemas.QuizResult(
+        content_id=content_id,
+        score_earned=score_earned,
+        total_score=user.total_score,
+        status=progress.status
+    )

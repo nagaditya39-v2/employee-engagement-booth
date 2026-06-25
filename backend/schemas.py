@@ -67,3 +67,18 @@ class ProgressOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AnswerSubmit(BaseModel):
+    user_id: int
+    question_id: int
+    selected_option: str  # "a" / "b" / "c" / "d"
+
+
+class QuizResult(BaseModel):
+    content_id: int
+    score_earned: int
+    total_score: int
+    status: str
+
+    class Config:
+        from_attributes = True

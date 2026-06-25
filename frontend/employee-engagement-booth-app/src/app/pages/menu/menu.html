@@ -9,11 +9,29 @@
     <div
       class="content-card"
       *ngFor="let item of contentItems"
-      (click)="openContent(item)"
     >
       <div class="card-type">{{ item.content_type }}</div>
       <h3>{{ item.title }}</h3>
       <div class="card-status">{{ getStatusLabel(item.id) }}</div>
+
+      <button
+        *ngIf="!progressMap[item.id] || progressMap[item.id] === 'not_started'"
+        (click)="openContent(item)"
+      >
+        View Content
+      </button>
+
+      <button
+        *ngIf="progressMap[item.id] === 'viewed'"
+        (click)="startQuiz(item)"
+      >
+        📝 Start Quiz
+      </button>
+
+      <ng-container *ngIf="progressMap[item.id] === 'quiz_assigned'">
+        <span class="quiz-in-progress">Quiz in progress — resume below</span>
+        <button (click)="startQuiz(item)">Resume Quiz</button>
+      </ng-container>
     </div>
   </div>
 </div>

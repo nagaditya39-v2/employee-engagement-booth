@@ -39,13 +39,15 @@ export class Login {
       this.errorMessage = 'Please enter your ID.';
       return;
     }
-    this.api.resumeByQr(this.userId.trim()).subscribe({
-      next: (user) => {
-        this.router.navigate(['/menu', user.id]);
-      },
-      error: () => {
-        this.errorMessage = 'User not found. Please register instead.';
-      }
+    const input = this.userId.trim();
+    const isNumeric = /^\d+$/.test(input);
+    const call = isNumeric
+      ? this.api.resumeById(Number(input))
+      : this.api.resumeByQr(input);
+
+    call.subscribe({
+      next: (user) => this.router.navigate(['/menu', user.id]),
+      error: () => { this.errorMessage = 'User not found. Please register instead.'; }
     });
   }
 }
