@@ -5,13 +5,31 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from typing import List
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 
-import uuid, qrcode, io, random, models, schemas, os
+import uuid, qrcode, io, random, models, schemas, os, logging
 
 from database import get_db
 from config import HOST_URL
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("booth")
+
 app = FastAPI()
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        logger.info(f"→ {request.method} {request.url} | client: {request.client}")
+        try:
+            response = await call_next(request)
+            logger.info(f"← {response.status_code} {request.url}")
+            return response
+        except Exception as e:
+            logger.error(f"✗ Error on {request.method} {request.url}: {e}")
+            raise
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,6 +37,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(LoggingMiddleware)
+
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
@@ -45,7 +66,7 @@ async def leaderboard_ws(websocket: WebSocket, db: Session = Depends(get_db)):
         users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
         standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in users]
         await websocket.send_json(standings)
-
+        logger.info(f"Leaderboard WS connected: {websocket.client}")
         # Keep connection alive, wait for client to disconnect
         while True:
             await websocket.receive_text()
@@ -64,7 +85,7 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-
+    logger.info(f"Registering user: {user.name}")
     return new_user
 
 @app.get("/qr/{qr_code}")
@@ -124,6 +145,7 @@ def resume_user(qr_code: str, db: Session = Depends(get_db)):
             selected_option=attempt.selected_option,
             answered_at=attempt.answered_at
         ))
+    logger.info(f"Resume attempt for QR: {qr_code}")
 
     return schemas.UserFullOut(
         id=user.id,
@@ -363,6 +385,8 @@ async def submit_quiz(user_id: int, content_id: int, db: Session = Depends(get_d
     all_users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
     standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in all_users]
     await manager.broadcast(standings)
+
+    logger.info(f"Quiz submitted — user {user_id}, content {content_id}, score {score_earned}")
 
     return schemas.QuizResult(
         content_id=content_id,
