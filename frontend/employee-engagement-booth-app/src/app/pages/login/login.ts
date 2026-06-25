@@ -1,43 +1,50 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { Api } from '../../services/api';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
 export class Login {
-  name = '';
+  name: string = '';
   userId: number | null = null;
-  error = '';
+  errorMessage: string = '';
+  mode: 'register' | 'resume' = 'register';
 
   constructor(private api: Api, private router: Router) {}
 
   register() {
-    if (!this.name.trim()) return;
+    if (!this.name.trim()) {
+      this.errorMessage = 'Please enter your name.';
+      return;
+    }
     this.api.register(this.name.trim()).subscribe({
       next: (user) => {
         this.router.navigate(['/menu', user.id]);
       },
       error: () => {
-        this.error = 'Registration failed. Please try again.';
+        this.errorMessage = 'Registration failed. Please try again.';
       }
     });
   }
 
-  resumeById() {
-    if (!this.userId) return;
+  resume() {
+    if (!this.userId) {
+      this.errorMessage = 'Please enter your ID.';
+      return;
+    }
     this.api.resumeById(this.userId).subscribe({
       next: (user) => {
         this.router.navigate(['/menu', user.id]);
       },
       error: () => {
-        this.error = 'User not found. Please register.';
+        this.errorMessage = 'User not found. Please register instead.';
       }
     });
   }

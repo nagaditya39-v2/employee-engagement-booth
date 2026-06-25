@@ -1,28 +1,20 @@
 <div class="login-container">
   <h1>Employee Engagement Booth</h1>
 
-  <div class="card">
-    <h2>Register</h2>
-    <input
-      type="text"
-      placeholder="Enter your name"
-      [(ngModel)]="name"
-      (keyup.enter)="register()"
-    />
-    <button (click)="register()" [disabled]="!name.trim()">Register</button>
+  <div class="mode-toggle">
+    <button [class.active]="mode === 'register'" (click)="mode = 'register'; errorMessage = ''">Register</button>
+    <button [class.active]="mode === 'resume'" (click)="mode = 'resume'; errorMessage = ''">Resume Session</button>
   </div>
 
-  <div class="divider">— or —</div>
-
-  <div class="card">
-    <h2>Resume Session</h2>
-    <input
-      type="number"
-      placeholder="Enter your user ID"
-      [(ngModel)]="userId"
-    />
-    <button (click)="resumeById()" [disabled]="!userId">Resume</button>
+  <div *ngIf="mode === 'register'" class="form-section">
+    <input [(ngModel)]="name" placeholder="Enter your name" />
+    <button (click)="register()">Register</button>
   </div>
 
-  <p class="error" *ngIf="error">{{ error }}</p>
+  <div *ngIf="mode === 'resume'" class="form-section">
+    <input [(ngModel)]="userId" type="number" placeholder="Enter your ID" />
+    <button (click)="resume()">Resume</button>
+  </div>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
 </div>
