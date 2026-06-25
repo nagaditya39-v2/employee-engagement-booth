@@ -15,7 +15,7 @@ export class Menu implements OnInit {
   userId: number = 0;
   contentItems: any[] = [];
   progressMap: { [contentId: number]: string } = {};
-  private contentWindow: Window | null = null;
+  contentWindow: Window | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -47,16 +47,23 @@ export class Menu implements OnInit {
       this.progressMap[item.id] = 'viewed';
       this.cdr.detectChanges();
 
-      const { secondScreenX, secondScreenY, displayWidth, displayHeight } = DISPLAY_CONFIG;
-      const windowFeatures = `left=${secondScreenX},top=${secondScreenY},width=${displayWidth},height=${displayHeight}`;
-
       if (!this.contentWindow || this.contentWindow.closed) {
+        // Reopen if user closed it
+        const { secondScreenX, secondScreenY, displayWidth, displayHeight } = DISPLAY_CONFIG;
+        const windowFeatures = `left=${secondScreenX},top=${secondScreenY},width=${displayWidth},height=${displayHeight}`;
         this.contentWindow = window.open(item.url, 'content-window', windowFeatures);
       } else {
         this.contentWindow.location.href = item.url;
         this.contentWindow.focus();
       }
     });
+  }
+
+  launchContentWindow() {
+    const { secondScreenX, secondScreenY, displayWidth, displayHeight } = DISPLAY_CONFIG;
+    const windowFeatures = `left=${secondScreenX},top=${secondScreenY},width=${displayWidth},height=${displayHeight}`;
+    this.contentWindow = window.open('http://127.0.0.1:8000/test-display', 'content-window', windowFeatures);
+    this.cdr.detectChanges();
   }
 
   getStatusLabel(contentId: number): string {

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from sqlalchemy.orm import Session
@@ -163,3 +163,13 @@ def get_user_progress(user_id: int, db: Session = Depends(get_db)):
             ))
 
     return result
+
+@app.get("/test-display", response_model=None)
+def test_display():
+    return HTMLResponse("""
+        <html>
+        <body style="background:#1a1a2e; color:white; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0;">
+            <h1>Display window ready — click a card to load content here</h1>
+        </body>
+        </html>
+    """)

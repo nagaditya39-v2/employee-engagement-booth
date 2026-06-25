@@ -1,6 +1,10 @@
 <div class="menu-container">
   <h2>Welcome! Choose a topic to explore.</h2>
 
+  <div class="launch-bar" *ngIf="!contentWindow || contentWindow.closed">
+    <button (click)="launchContentWindow()">🖥 Launch Display Window</button>
+  </div>
+
   <div class="content-grid">
     <div
       class="content-card"

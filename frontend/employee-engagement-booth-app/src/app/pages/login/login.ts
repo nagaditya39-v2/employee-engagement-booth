@@ -13,7 +13,7 @@ import { Api } from '../../services/api';
 })
 export class Login {
   name: string = '';
-  userId: number | null = null;
+  userId: string = '';
   errorMessage: string = '';
   mode: 'register' | 'resume' = 'register';
 
@@ -35,11 +35,11 @@ export class Login {
   }
 
   resume() {
-    if (!this.userId) {
+    if (!this.userId.trim()) {
       this.errorMessage = 'Please enter your ID.';
       return;
     }
-    this.api.resumeById(this.userId).subscribe({
+    this.api.resumeByQr(this.userId.trim()).subscribe({
       next: (user) => {
         this.router.navigate(['/menu', user.id]);
       },
