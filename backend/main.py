@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.responses import StreamingResponse, HTMLResponse
+from fastapi.responses import StreamingResponse, HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from typing import List
 
-import uuid, qrcode, io, random, models, schemas
+import uuid, qrcode, io, random, models, schemas, os
 
 from database import get_db
 from config import HOST_URL
@@ -50,10 +51,6 @@ async def leaderboard_ws(websocket: WebSocket, db: Session = Depends(get_db)):
             await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        
-@app.get("/")
-def root_url():
-    return {"message": "you've come to the root page"}
 
 @app.post("/register", response_model=schemas.UserOut)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -373,3 +370,14 @@ async def submit_quiz(user_id: int, content_id: int, db: Session = Depends(get_d
         total_score=user.total_score,
         status=progress.status
     )
+
+static_dir = os.path.join(os.path.dirname(__file__), "../frontend/employee-engagement-booth-app/dist/employee-engagement-booth-app/browser")
+
+# app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
+
+@app.get("/{full_path:path}", response_class=FileResponse)
+def serve_spa(full_path: str):
+    file_path = os.path.join(static_dir, full_path)
+    if os.path.isfile(file_path):
+        return FileResponse(file_path)
+    return FileResponse(os.path.join(static_dir, "index.html"))
