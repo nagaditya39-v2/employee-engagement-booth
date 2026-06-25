@@ -1,63 +1,183 @@
+/* ─── Quiz ────────────────────────────────────────────────────────── */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #0f0f13;
+  color: #f0eff4;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
 .quiz-container {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 3rem 2rem;
 }
 
+/* Error banner */
+.error {
+  background: rgba(200, 60, 60, 0.1);
+  border: 1px solid rgba(200, 60, 60, 0.3);
+  border-radius: 10px;
+  color: #f08080;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Progress line */
 .progress {
-  opacity: 0.7;
-  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  color: #8e8d99;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+  margin: 0 0 1rem;
 }
 
+/* Progress bar */
+.progress-bar-track {
+  height: 3px;
+  background: #2a2a36;
+  border-radius: 2px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+
+  .progress-bar-fill {
+    height: 100%;
+    background: #6c6bff;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+}
+
+/* Question text */
+h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #f0eff4;
+  margin: 0 0 1.75rem;
+  letter-spacing: -0.01em;
+}
+
+/* Options list */
 .options {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin: 1.5rem 0;
+  gap: 0.65rem;
+  margin-bottom: 2rem;
+
+  button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.9rem 1.1rem;
+    background: #1a1a24;
+    border: 1.5px solid #2a2a36;
+    border-radius: 12px;
+    color: #d0cfe0;
+    font-size: 0.95rem;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+
+    /* Letter circle */
+    &::before {
+      content: attr(data-letter);
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #2a2a36;
+      border: 1px solid #3a3a4a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #8e8d99;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: #6c6bff;
+      background: rgba(108, 107, 255, 0.07);
+      color: #f0eff4;
+    }
+
+    &.selected {
+      border-color: #6c6bff;
+      background: rgba(108, 107, 255, 0.12);
+      color: #f0eff4;
+
+      &::before {
+        background: #6c6bff;
+        border-color: #6c6bff;
+        color: #fff;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
 }
 
-.options button {
-  padding: 0.9rem 1rem;
-  border-radius: 8px;
-  border: 2px solid #ccc;
-  background: white;
-  cursor: pointer;
-  font-size: 1rem;
-  text-align: left;
-}
-
-.options button.selected {
-  border-color: #4a6cf7;
-  background: #eef1ff;
-}
-
+/* Submit button */
 .submit-btn {
-  padding: 0.8rem 2rem;
-  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  background: #6c6bff;
+  color: #fff;
   border: none;
-  background: #4a6cf7;
-  color: white;
-  font-size: 1rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: background 0.15s, transform 0.1s, opacity 0.15s;
+  min-width: 140px;
+
+  &:hover:not(:disabled) {
+    background: #7e7dff;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 }
 
-.submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+/* Result screen */
+.result {
+  text-align: center;
+  padding: 3rem 1rem;
 
-.error {
-  color: #d33;
-  font-weight: bold;
-}
+  h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1.25rem;
+    color: #f0eff4;
+  }
 
-.result h2 {
-  margin-bottom: 1rem;
-}
+  p {
+    font-size: 1rem;
+    color: #b0afc0;
+    margin: 0.35rem 0;
 
-.redirecting {
-  opacity: 0.6;
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
+    strong {
+      color: #f0eff4;
+      font-size: 1.15em;
+    }
+  }
+
+  .redirecting {
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: #6e6d7a;
+  }
 }

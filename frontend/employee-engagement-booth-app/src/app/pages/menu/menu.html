@@ -1,5 +1,9 @@
 <div class="menu-container">
-  <h2>Welcome! Choose a topic to explore.</h2>
+
+  <div class="menu-header">
+    <h2>Choose a topic to explore</h2>
+    <p class="subtitle">View each section, then take the quiz to earn points.</p>
+  </div>
 
   <div class="launch-bar" *ngIf="!contentWindow || contentWindow.closed">
     <button (click)="launchContentWindow()">🖥 Launch Display Window</button>
@@ -9,12 +13,16 @@
     <div
       class="content-card"
       *ngFor="let item of contentItems"
+      [class.status-viewed]="progressMap[item.id] === 'viewed'"
+      [class.status-active]="progressMap[item.id] === 'quiz_assigned'"
+      [class.status-done]="progressMap[item.id] === 'quiz_completed'"
     >
       <div class="card-type">{{ item.content_type }}</div>
       <h3>{{ item.title }}</h3>
       <div class="card-status">{{ getStatusLabel(item.id) }}</div>
 
       <button
+        class="btn-primary"
         *ngIf="!progressMap[item.id] || progressMap[item.id] === 'not_started'"
         (click)="openContent(item)"
       >
@@ -22,6 +30,7 @@
       </button>
 
       <button
+        class="btn-primary"
         *ngIf="progressMap[item.id] === 'viewed'"
         (click)="startQuiz(item)"
       >
@@ -29,9 +38,11 @@
       </button>
 
       <ng-container *ngIf="progressMap[item.id] === 'quiz_assigned'">
-        <span class="quiz-in-progress">Quiz in progress — resume below</span>
-        <button (click)="startQuiz(item)">Resume Quiz</button>
+        <span class="quiz-in-progress">Quiz running on display screen</span>
+        <button class="btn-secondary" (click)="startQuiz(item)">Resume Quiz</button>
       </ng-container>
+
     </div>
   </div>
+
 </div>

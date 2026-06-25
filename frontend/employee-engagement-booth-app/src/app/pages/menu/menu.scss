@@ -1,47 +1,213 @@
+/* ─── Menu ────────────────────────────────────────────────────────── */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #0f0f13;
+  color: #f0eff4;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
 .menu-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  font-family: sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 3rem;
+}
+
+/* Header */
+.menu-header {
+  margin-bottom: 2rem;
 
   h2 {
-    margin-bottom: 2rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.4rem;
+    color: #f0eff4;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: #8e8d99;
+    margin: 0;
   }
 }
 
+/* Launch bar */
+.launch-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.2rem;
+    background: transparent;
+    border: 1px solid #3a3a4a;
+    border-radius: 8px;
+    color: #b0afc0;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+
+    &:hover {
+      border-color: #6c6bff;
+      color: #c2c1ff;
+      background: rgba(108, 107, 255, 0.08);
+    }
+  }
+}
+
+/* Grid */
 .content-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 800px;
+  gap: 1.25rem;
 }
 
+/* Cards */
 .content-card {
-  border: 2px solid #333;
-  border-radius: 8px;
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: background 0.2s;
+  position: relative;
+  background: #1a1a24;
+  border: 1px solid #2a2a36;
+  border-radius: 20px;
+  padding: 1.75rem 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: border-color 0.2s, transform 0.15s;
+  overflow: hidden;
+
+  /* Circular accent blob in top-right corner */
+  &::before {
+    content: '';
+    position: absolute;
+    top: -28px;
+    right: -28px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(108, 107, 255, 0.12);
+    transition: background 0.2s;
+    pointer-events: none;
+  }
 
   &:hover {
-    background: #f0f0f0;
+    border-color: #3a3a50;
+    transform: translateY(-2px);
+
+    &::before {
+      background: rgba(108, 107, 255, 0.2);
+    }
   }
 
-  .card-type {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #666;
-    margin-bottom: 0.5rem;
+  /* Status variants */
+  &.status-viewed {
+    border-color: #2a3a50;
+
+    &::before {
+      background: rgba(30, 120, 200, 0.15);
+    }
   }
 
-  h3 {
-    margin: 0 0 1rem 0;
+  &.status-active {
+    border-color: #3a3020;
+
+    &::before {
+      background: rgba(200, 150, 30, 0.15);
+    }
   }
 
-  .card-status {
-    font-size: 0.9rem;
-    font-weight: bold;
+  &.status-done {
+    border-color: #1e3a2a;
+
+    &::before {
+      background: rgba(30, 180, 100, 0.15);
+    }
   }
+}
+
+/* Content type pill */
+.card-type {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.2rem 0.65rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.06);
+  color: #8e8d99;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Card title */
+.content-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.25rem 0 0;
+  color: #f0eff4;
+  line-height: 1.3;
+  flex: 1;
+}
+
+/* Status label */
+.card-status {
+  font-size: 0.8rem;
+  color: #8e8d99;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+/* Buttons */
+.btn-primary {
+  margin-top: 0.75rem;
+  padding: 0.6rem 1.1rem;
+  background: #6c6bff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  align-self: flex-start;
+
+  &:hover {
+    background: #7e7dff;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.btn-secondary {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: #b0afc0;
+  border: 1px solid #3a3a4a;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  align-self: flex-start;
+
+  &:hover {
+    border-color: #6c6bff;
+    color: #c2c1ff;
+  }
+}
+
+/* Quiz in-progress text */
+.quiz-in-progress {
+  display: block;
+  font-size: 0.82rem;
+  color: #c8a030;
+  margin-top: 0.5rem;
 }
