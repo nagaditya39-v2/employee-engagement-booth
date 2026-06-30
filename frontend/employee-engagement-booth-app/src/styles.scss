@@ -1,9 +1,100 @@
+/* ─── Global theme tokens ──────────────────────────────────────────
+   Direction: "event badge / scanner" — cobalt blue, bracket-corner
+   framing (like a viewfinder locking onto a badge), monospace IDs
+   for a ticket/boarding-pass feel, Space Grotesk for display type.
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Color */
+  --cobalt: #2b54ff;
+  --cobalt-bright: #5b7fff;
+  --cobalt-deep: #0f1f8c;
+  --cobalt-glow: rgba(43, 84, 255, 0.45);
+  --bg: #090b16;
+  --bg-grid: #0d1024;
+  --surface: #11142a;
+  --surface-2: #171b3a;
+  --border: #262b56;
+  --border-bright: #3a4180;
+  --text: #f3f4ff;
+  --text-dim: #9298c2;
+  --text-faint: #5b6092;
+  --gold: #ffc857;
+  --success: #3ddc97;
+  --danger: #ff6b6b;
+
+  /* Type */
+  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(43, 84, 255, 0.18), transparent),
+    var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--cobalt);
+  color: white;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cobalt-bright);
+  outline-offset: 3px;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Reusable bracket-corner frame — the signature motif.
+   Apply via .bracket-frame on any positioned container. */
+.bracket-frame {
+  position: relative;
+
+  &::before, &::after,
+  & .br-tl, & .br-br {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--cobalt-bright);
+    opacity: 0.85;
+  }
+
+  &::before {
+    top: -8px;
+    left: -8px;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  &::after {
+    bottom: -8px;
+    right: -8px;
+    border-left: none;
+    border-top: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

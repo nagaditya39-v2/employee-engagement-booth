@@ -1,0 +1,22 @@
+<div class="resume-container">
+
+  <p class="eyebrow">Welcome back</p>
+  <h1>Continue your session</h1>
+  <p class="subtitle">Enter your ID number or scan your QR code to pick up where you left off.</p>
+
+  <div class="form-section">
+    <input
+      [(ngModel)]="userId"
+      placeholder="ID number or QR code"
+      autocomplete="off"
+      (keyup.enter)="resume()"
+    />
+    <button class="btn-primary" (click)="resume()">Continue →</button>
+  </div>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <p class="switch-link">
+    First time here? <a (click)="goToRegister()">Sign up</a>
+  </p>
+</div>

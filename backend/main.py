@@ -216,8 +216,62 @@ def get_user_progress(user_id: int, db: Session = Depends(get_db)):
 def test_display():
     return HTMLResponse("""
         <html>
-        <body style="background:#1a1a2e; color:white; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0;">
-            <h1>Display window ready — click a card to load content here</h1>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+              background:
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(43,84,255,0.22), transparent),
+                #090b16;
+              color: #f3f4ff;
+              font-family: 'Inter', sans-serif;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              height: 100vh;
+              text-align: center;
+              gap: 1rem;
+            }
+            .pulse {
+              width: 64px; height: 64px;
+              border-radius: 18px;
+              border: 1.5px solid #3a4180;
+              background: linear-gradient(160deg, #171b3a, #11142a);
+              display: flex; align-items: center; justify-content: center;
+              font-size: 1.6rem;
+              color: #5b7fff;
+              box-shadow: 0 0 0 1px rgba(43,84,255,0.08), 0 20px 50px -20px rgba(43,84,255,0.45);
+              animation: glow 2.4s ease-in-out infinite;
+            }
+            @keyframes glow {
+              0%, 100% { box-shadow: 0 0 0 1px rgba(43,84,255,0.08), 0 20px 50px -20px rgba(43,84,255,0.45); }
+              50% { box-shadow: 0 0 0 1px rgba(43,84,255,0.16), 0 20px 60px -15px rgba(43,84,255,0.65); }
+            }
+            h1 {
+              font-family: 'Space Grotesk', sans-serif;
+              font-weight: 600;
+              font-size: 1.6rem;
+              letter-spacing: -0.01em;
+            }
+            p {
+              color: #9298c2;
+              font-size: 0.95rem;
+              max-width: 360px;
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .pulse { animation: none; }
+            }
+          </style>
+        </head>
+        <body>
+            <div class="pulse">⌁</div>
+            <h1>Display ready</h1>
+            <p>Choose an activity on the kiosk to load it here.</p>
         </body>
         </html>
     """)
@@ -401,7 +455,10 @@ static_dir = os.path.join(os.path.dirname(__file__), "../frontend/employee-engag
 
 @app.get("/{full_path:path}", response_class=FileResponse)
 def serve_spa(full_path: str):
+    index_path = os.path.join(static_dir, "index.html")
+    if not os.path.isfile(index_path):
+        raise HTTPException(status_code=503, detail="Frontend not built yet. Run 'ng build' or use ng serve on port 4200 during development.")
     file_path = os.path.join(static_dir, full_path)
     if os.path.isfile(file_path):
         return FileResponse(file_path)
-    return FileResponse(os.path.join(static_dir, "index.html"))
+    return FileResponse(index_path)

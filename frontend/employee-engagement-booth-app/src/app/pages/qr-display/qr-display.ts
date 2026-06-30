@@ -24,6 +24,6 @@ export class QrDisplay implements OnInit {
   }
 
   goToMenu() {
-    this.router.navigate(['/menu', this.userId]);
+    this.router.navigate(['/register']);
   }
 }

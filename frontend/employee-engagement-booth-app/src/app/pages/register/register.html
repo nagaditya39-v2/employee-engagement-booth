@@ -1,0 +1,16 @@
+<div class="register-container">
+  <p class="eyebrow">Employee Engagement Booth</p>
+  <h1>Let's get you a badge</h1>
+  <p class="subtitle">Just your name — we'll generate your ID and QR code next.</p>
+
+  <div class="form-section">
+    <input [(ngModel)]="name" placeholder="Your name" autocomplete="off" (keyup.enter)="register()" />
+    <button class="btn-primary" (click)="register()">Register</button>
+  </div>
+
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <p class="switch-link">
+    Already registered? <a (click)="goToResume()">Resume session</a>
+  </p>
+</div>

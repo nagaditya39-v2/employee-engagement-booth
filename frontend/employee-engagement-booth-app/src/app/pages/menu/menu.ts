@@ -111,7 +111,7 @@ export class Menu implements OnInit, OnDestroy {
 
     // Give the kiosk a moment to show "Completed" before resetting for the next person.
     setTimeout(() => {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/resume']);
     }, 4000);
   }
 
@@ -120,6 +120,11 @@ export class Menu implements OnInit, OnDestroy {
     if (status === 'quiz_completed') return '✅ Completed';
     if (status === 'quiz_assigned') return '📺 Quiz in progress on display screen';
     if (status === 'viewed') return '👁 Viewed';
-    return '🔵 Not Started';
+    return '🔵 Not started';
+  }
+
+  // Drives the "X of N completed" pill in the header.
+  completedCount(): number {
+    return Object.values(this.progressMap).filter(s => s === 'quiz_completed').length;
   }
 }

@@ -5,17 +5,15 @@ import { CommonModule } from '@angular/common';
 import { Api } from '../../services/api';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './login.html',
-  styleUrl: './login.scss'
+  templateUrl: './register.html',
+  styleUrl: './register.scss'
 })
-export class Login {
+export class Register {
   name: string = '';
-  userId: string = '';
   errorMessage: string = '';
-  mode: 'register' | 'resume' = 'register';
 
   constructor(private api: Api, private router: Router) {}
 
@@ -34,20 +32,7 @@ export class Login {
     });
   }
 
-  resume() {
-    if (!this.userId.trim()) {
-      this.errorMessage = 'Please enter your ID.';
-      return;
-    }
-    const input = this.userId.trim();
-    const isNumeric = /^\d+$/.test(input);
-    const call = isNumeric
-      ? this.api.resumeById(Number(input))
-      : this.api.resumeByQr(input);
-
-    call.subscribe({
-      next: (user) => this.router.navigate(['/menu', user.id]),
-      error: () => { this.errorMessage = 'User not found. Please register instead.'; }
-    });
+  goToResume() {
+    this.router.navigate(['/resume']);
   }
 }
