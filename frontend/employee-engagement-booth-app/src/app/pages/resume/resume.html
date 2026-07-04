@@ -2,16 +2,26 @@
 
   <p class="eyebrow">Welcome back</p>
   <h1>Continue your session</h1>
-  <p class="subtitle">Enter your ID number or scan your QR code to pick up where you left off.</p>
+  <p class="subtitle">Scan your badge, or enter your ID number to pick up where you left off.</p>
 
-  <div class="form-section">
+  <div class="scanner-section" *ngIf="scannerActive">
+    <div id="qr-reader"></div>
+    <p class="scanner-hint" *ngIf="scannerStarting">Starting camera…</p>
+    <button class="btn-secondary" (click)="stopScanner()">Cancel scan</button>
+  </div>
+
+  <div class="form-section" *ngIf="!scannerActive">
+    <button class="btn-primary" (click)="startScanner()">📷 Scan Badge</button>
+
+    <div class="divider"><span>or</span></div>
+
     <input
       [(ngModel)]="userId"
       placeholder="ID number or QR code"
       autocomplete="off"
       (keyup.enter)="resume()"
     />
-    <button class="btn-primary" (click)="resume()">Continue →</button>
+    <button class="btn-secondary" (click)="resume()">Continue →</button>
   </div>
 
   <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>

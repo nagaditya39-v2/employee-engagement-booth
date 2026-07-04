@@ -21,7 +21,7 @@ export class Leaderboard implements OnInit, OnDestroy {
   }
 
   connect() {
-    const wsUrl = API_BASE_URL.replace('http://', 'ws://') + '/ws/leaderboard';
+    const wsUrl = API_BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://') + '/ws/leaderboard';
     this.socket = new WebSocket(wsUrl);
 
     this.socket.onopen = () => {

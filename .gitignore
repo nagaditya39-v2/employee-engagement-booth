@@ -12,6 +12,7 @@ dist/
 
 # Environment files
 .env
+certs/
 
 # OS junk
 .DS_Store
