@@ -61,7 +61,8 @@ export class Menu implements OnInit, OnDestroy {
     this.api.markViewed(item.id, this.userId).subscribe(() => {
       this.progressMap[item.id] = 'viewed';
       this.cdr.detectChanges();
-      this.openSecondScreen(item.url);
+      const url = `${window.location.origin}/content-window/`;
+      this.openSecondScreen(url);
     });
   }
 
@@ -103,6 +104,12 @@ export class Menu implements OnInit, OnDestroy {
   // static welcome/display page; the two are independent.
   private handleSecondScreenMessage(event: MessageEvent) {
     const data = event.data;
+
+    if (event.data.type === 'BACK_TO_RESUME') {
+      this.router.navigate(['/resume']);
+      return;
+    }
+
     if (!data || data.type !== 'quiz-complete' || data.userId !== this.userId) return;
 
     this.progressMap[data.contentId] = 'quiz_completed';
