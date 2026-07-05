@@ -1,16 +1,8 @@
-/* ─── Menu ────────────────────────────────────────────────────────── */
-
-:host {
-  display: block;
-  min-height: 100vh;
-  color: var(--text);
-  font-family: var(--font-body);
-}
-
 .menu-container {
   max-width: 960px;
   margin: 0 auto;
   padding: 2.75rem 2rem 3rem;
+  position: relative; z-index: 1; 
 }
 
 /* Header */
@@ -209,7 +201,7 @@
   margin-top: 0.7rem;
   padding: 0.65rem 1.1rem;
   background: linear-gradient(135deg, var(--cobalt-bright), var(--cobalt));
-  color: #fff;
+  color: #ffffff;
   border: none;
   border-radius: 10px;
   font-size: 0.875rem;

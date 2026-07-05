@@ -1,9 +1,4 @@
-/* ─── Leaderboard (always-on TV display) ─────────────────────────── */
-
-:host {
-  display: block;
-  min-height: 100vh;
-}
+.leaderboard-page { padding-top: 2rem; }
 
 .leaderboard-container {
   display: flex;
@@ -13,6 +8,7 @@
   padding: 3rem 2rem;
   font-family: var(--font-body);
   color: var(--text);
+  position: relative; z-index: 1; 
 }
 
 .lb-header {

@@ -461,4 +461,9 @@ def serve_spa(full_path: str):
     file_path = os.path.join(static_dir, full_path)
     if os.path.isfile(file_path):
         return FileResponse(file_path)
+    # Anything that looks like a static asset request (has a file extension,
+    # e.g. /assets/img/wordmark.png) should 404 for real if missing — silently
+    # falling back to index.html here just masks broken asset paths as "200 OK".
+    if "." in os.path.basename(full_path):
+        raise HTTPException(status_code=404, detail=f"Static asset not found: {full_path}")
     return FileResponse(index_path)

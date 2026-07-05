@@ -1,16 +1,18 @@
-/* ─── Quiz (second display — larger type per spec) ──────────────────── */
+.quiz-page { padding-top: 2.5rem; }
 
-:host {
+.fan-icon-result {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  opacity: 0.9;
   display: block;
-  min-height: 100vh;
-  color: var(--text);
-  font-family: var(--font-body);
 }
 
 .quiz-container {
   max-width: 760px;
   margin: 0 auto;
   padding: 3.5rem 2.5rem;
+  position: relative; z-index: 1;
 }
 
 /* Error banner */
@@ -116,7 +118,7 @@ h2 {
       &::before {
         background: var(--cobalt);
         border-color: var(--cobalt-bright);
-        color: #fff;
+        color: #ffffff;
       }
     }
 
@@ -131,7 +133,7 @@ h2 {
 .submit-btn {
   padding: 1rem 2.5rem;
   background: linear-gradient(135deg, var(--cobalt-bright), var(--cobalt));
-  color: #fff;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   font-size: 1.05rem;

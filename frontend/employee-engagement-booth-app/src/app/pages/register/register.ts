@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Api } from '../../services/api';
+import { BrandHeader } from '../../shared/brand-header/brand-header';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BrandHeader],
   templateUrl: './register.html',
   styleUrl: './register.scss'
 })

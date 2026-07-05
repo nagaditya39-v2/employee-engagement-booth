@@ -1,27 +1,27 @@
-/* ─── Global theme tokens ──────────────────────────────────────────
-   Direction: "event badge / scanner" — cobalt blue, bracket-corner
-   framing (like a viewfinder locking onto a badge), monospace IDs
-   for a ticket/boarding-pass feel, Space Grotesk for display type.
-   ────────────────────────────────────────────────────────────── */
-
 :root {
-  /* Color */
-  --cobalt: #2b54ff;
-  --cobalt-bright: #5b7fff;
-  --cobalt-deep: #0f1f8c;
-  --cobalt-glow: rgba(43, 84, 255, 0.45);
-  --bg: #090b16;
-  --bg-grid: #0d1024;
-  --surface: #11142a;
-  --surface-2: #171b3a;
-  --border: #262b56;
-  --border-bright: #3a4180;
-  --text: #f3f4ff;
-  --text-dim: #9298c2;
-  --text-faint: #5b6092;
-  --gold: #ffc857;
-  --success: #3ddc97;
-  --danger: #ff6b6b;
+  /* Color — mapped to accepted palette */
+  --cobalt: #0047c0;              /* blue-600 */
+  --cobalt-bright: #428fff;       /* blue-400 */
+  --cobalt-deep: #001e68;         /* blue-800 */
+  --cobalt-glow: rgba(0, 71, 192, 0.45); /* blue-600 @ 45% */
+
+  --bg: #04015a;                  /* RRblue-900 */
+  --bg-grid: #001044;             /* blue-900 */
+  --surface: #001e68;             /* blue-800 */
+  --surface-2: #002f90;           /* blue-700 */
+  --border: #002f90;              /* blue-700 */
+  --border-bright: #0067ef;       /* blue-500 */
+
+  --text: #ebf4ff;                /* blue-50 */
+  --text-dim: #adadad;            /* gray-300 */
+  --text-faint: #6b6b6b;          /* gray-500 */
+
+  --gold: #f4be51;                /* yellow-200 */
+  --success: #9bb257;             /* green-300 */
+  --danger: #ff867c;              /* red-300 */
+
+  /* Page background — one persistent photo/vector across the whole app */
+  --bg-photo: url('/assets/img/bg-photo.svg');
 
   /* Type */
   --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
@@ -39,11 +39,20 @@ html, body {
   height: 100%;
 }
 
+/* Persistent full-site background. Painted once here so every page gets
+   it automatically — pages no longer need a .page-bg class or inline
+   --page-bg override. A dark scrim keeps foreground text legible over
+   the photo regardless of scroll position. */
 body {
   font-family: var(--font-body);
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(43, 84, 255, 0.18), transparent),
-    var(--bg);
+    linear-gradient(rgba(4, 1, 90, 0.65), rgba(4, 1, 90, 0.65)),
+    var(--bg-photo);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
 }

@@ -1,60 +1,64 @@
-<div class="menu-container">
+<div class="menu-page">
 
-  <div class="menu-header">
-    <div class="header-text">
-      <p class="eyebrow">Your activities</p>
-      <h2>Choose a topic to explore</h2>
-      <p class="subtitle">View each section, then take the quiz to earn points.</p>
-    </div>
-    <div class="progress-pill" *ngIf="contentItems.length">
-      <span class="pill-count">{{ completedCount() }}</span>
-      <span class="pill-sep">/</span>
-      <span class="pill-total">{{ contentItems.length }}</span>
-      <span class="pill-label">completed</span>
-    </div>
-  </div>
+    <div class="menu-container">
 
-  <div class="launch-bar" *ngIf="!contentWindow || contentWindow.closed">
-    <button (click)="launchContentWindow()">🖥 Launch display window</button>
-  </div>
-
-  <div class="content-grid">
-    <div
-      class="content-card"
-      *ngFor="let item of contentItems"
-      [class.status-viewed]="progressMap[item.id] === 'viewed'"
-      [class.status-active]="progressMap[item.id] === 'quiz_assigned'"
-      [class.status-done]="progressMap[item.id] === 'quiz_completed'"
-    >
-      <div class="card-top">
-        <div class="card-type">{{ item.content_type }}</div>
-        <div class="status-dot"></div>
+      <div class="menu-header">
+        <div class="header-text">
+          <p class="eyebrow">Your activities</p>
+          <h2>Choose a topic to explore</h2>
+          <p class="subtitle">View each section, then take the quiz to earn points.</p>
+        </div>
+        <div class="progress-pill" *ngIf="contentItems.length">
+          <span class="pill-count">{{ completedCount() }}</span>
+          <span class="pill-sep">/</span>
+          <span class="pill-total">{{ contentItems.length }}</span>
+          <span class="pill-label">completed</span>
+        </div>
       </div>
-      <h3>{{ item.title }}</h3>
-      <div class="card-status">{{ getStatusLabel(item.id) }}</div>
 
-      <button
-        class="btn-primary"
-        *ngIf="!progressMap[item.id] || progressMap[item.id] === 'not_started'"
-        (click)="openContent(item)"
-      >
-        View content
-      </button>
+      <div class="launch-bar" *ngIf="!contentWindow || contentWindow.closed">
+        <button (click)="launchContentWindow()">🖥 Launch display window</button>
+      </div>
 
-      <button
-        class="btn-primary"
-        *ngIf="progressMap[item.id] === 'viewed'"
-        (click)="startQuiz(item)"
-      >
-        Start quiz
-      </button>
+      <div class="content-grid">
+        <div
+          class="content-card"
+          *ngFor="let item of contentItems"
+          [class.status-viewed]="progressMap[item.id] === 'viewed'"
+          [class.status-active]="progressMap[item.id] === 'quiz_assigned'"
+          [class.status-done]="progressMap[item.id] === 'quiz_completed'"
+        >
+          <div class="card-top">
+            <div class="card-type">{{ item.content_type }}</div>
+            <div class="status-dot"></div>
+          </div>
+          <h3>{{ item.title }}</h3>
+          <div class="card-status">{{ getStatusLabel(item.id) }}</div>
 
-      <ng-container *ngIf="progressMap[item.id] === 'quiz_assigned'">
-        <span class="quiz-in-progress">Quiz running on display screen</span>
-        <button class="btn-secondary" (click)="startQuiz(item)">Resume quiz</button>
-      </ng-container>
+          <button
+            class="btn-primary"
+            *ngIf="!progressMap[item.id] || progressMap[item.id] === 'not_started'"
+            (click)="openContent(item)"
+          >
+            View content
+          </button>
 
+          <button
+            class="btn-primary"
+            *ngIf="progressMap[item.id] === 'viewed'"
+            (click)="startQuiz(item)"
+          >
+            Start quiz
+          </button>
+
+          <ng-container *ngIf="progressMap[item.id] === 'quiz_assigned'">
+            <span class="quiz-in-progress">Quiz running on display screen</span>
+            <button class="btn-secondary" (click)="startQuiz(item)">Resume quiz</button>
+          </ng-container>
+
+        </div>
+      </div>
+      
     </div>
-  </div>
 
 </div>

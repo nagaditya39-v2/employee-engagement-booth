@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Api } from '../../services/api';
+import { BrandHeader } from '../../shared/brand-header/brand-header';
 
 @Component({
   selector: 'app-resume',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BrandHeader],
   templateUrl: './resume.html',
   styleUrl: './resume.scss'
 })

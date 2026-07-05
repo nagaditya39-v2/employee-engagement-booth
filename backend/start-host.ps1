@@ -26,19 +26,20 @@ param(
 $ErrorActionPreference = "Stop"
 
 # ── 0. Make sure this machine trusts mkcert's root CA ────────────────
-# Safe to call every time — it's a no-op if already installed.
+# Safe to call every time - it's a no-op if already installed.
 mkcert -install | Out-Null
 
 # ── 1. Detect LAN IP ──────────────────────────────────────────────────
 Write-Host "Detecting LAN IP..." -ForegroundColor Cyan
 
-$candidates = Get-NetIPAddress -AddressFamily IPv4 |
+# Added @(...) here to force an array
+$candidates = @(Get-NetIPAddress -AddressFamily IPv4 |
     Where-Object {
         $_.IPAddress -ne "127.0.0.1" -and
         $_.PrefixOrigin -ne "WellKnown" -and
         $_.InterfaceAlias -notmatch "Loopback|vEthernet|Virtual"
     } |
-    Select-Object -ExpandProperty IPAddress
+    Select-Object -ExpandProperty IPAddress)
 
 if ($candidates.Count -eq 0) {
     Write-Host "No LAN IP found. Are you connected to the event WiFi/hotspot?" -ForegroundColor Red
@@ -68,32 +69,32 @@ $certFile = Join-Path $certsDir "$lanIp+2.pem"
 $keyFile  = Join-Path $certsDir "$lanIp+2-key.pem"
 
 if (-not (Test-Path $certFile) -or -not (Test-Path $keyFile)) {
-    Write-Host "No existing certificate for $lanIp — generating one..." -ForegroundColor Cyan
+    Write-Host "No existing certificate for $lanIp - generating one..." -ForegroundColor Cyan
     Push-Location $certsDir
     mkcert $lanIp localhost 127.0.0.1
     Pop-Location
 } else {
-    Write-Host "Certificate for $lanIp already exists — reusing it." -ForegroundColor Green
+    Write-Host "Certificate for $lanIp already exists - reusing it." -ForegroundColor Green
 }
 
 if (-not (Test-Path $certFile) -or -not (Test-Path $keyFile)) {
-    Write-Host "Certificate generation failed — check that mkcert is installed and on PATH." -ForegroundColor Red
+    Write-Host "Certificate generation failed - check that mkcert is installed and on PATH." -ForegroundColor Red
     exit 1
 }
 
 # ── 3. Update config.py and constants.ts to match this IP ───────────
-Write-Host "Updating HOST_URL and API_BASE_URL to https://$lanIp:8000 ..." -ForegroundColor Cyan
+Write-Host "Updating HOST_URL and API_BASE_URL to https://${lanIp}:8000 ..." -ForegroundColor Cyan
 
 $configPath = Join-Path $PSScriptRoot "config.py"
-(Get-Content $configPath) -replace 'HOST_URL\s*=\s*".*"', "HOST_URL = `"https://$lanIp:8000`"" |
+(Get-Content $configPath) -replace 'HOST_URL\s*=\s*".*"', "HOST_URL = `"https://${lanIp}:8000`"" |
     Set-Content $configPath
 
 $constantsPath = Join-Path $PSScriptRoot "..\frontend\employee-engagement-booth-app\src\app\constants.ts"
 if (Test-Path $constantsPath) {
-    (Get-Content $constantsPath) -replace "API_BASE_URL\s*=\s*'.*'", "API_BASE_URL = 'https://$lanIp:8000'" |
+    (Get-Content $constantsPath) -replace "API_BASE_URL\s*=\s*'.*'", "API_BASE_URL = 'https://${lanIp}:8000'" |
         Set-Content $constantsPath
 } else {
-    Write-Host "Warning: constants.ts not found at expected path — update it manually." -ForegroundColor Yellow
+    Write-Host "Warning: constants.ts not found at expected path - update it manually." -ForegroundColor Yellow
 }
 
 # ── 4. Rebuild Angular so the new IP is baked into the static build ──
@@ -109,11 +110,11 @@ if (-not $SkipBuild) {
 }
 
 # ── 5. Activate venv and start uvicorn with SSL ──────────────────────
-Write-Host "Starting backend on https://$lanIp:8000 ..." -ForegroundColor Cyan
+Write-Host "Starting backend on https://${lanIp}:8000 ..." -ForegroundColor Cyan
 
 $venvActivate = Join-Path $PSScriptRoot "venv\Scripts\Activate.ps1"
 if (-not (Test-Path $venvActivate)) {
-    Write-Host "venv not found at backend\venv — create it first: python -m venv venv" -ForegroundColor Red
+    Write-Host "venv not found at backend\venv - create it first: python -m venv venv" -ForegroundColor Red
     exit 1
 }
 . $venvActivate

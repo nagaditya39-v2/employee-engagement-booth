@@ -1,20 +1,28 @@
-/* ─── QR Display — "your badge" ticket ───────────────────────────── */
-
-:host {
-  display: block;
-  min-height: 100vh;
-}
+:host { display: block; }
 
 .qr-container {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
   padding: 2.5rem 1.5rem;
+}
+
+.qr-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 0.8rem;
   text-align: center;
   color: var(--text);
+}
+
+.fan-icon {
+  width: 34px;
+  height: 34px;
+  opacity: 0.8;
+  margin-bottom: 0.2rem;
 }
 
 .eyebrow {

@@ -1,22 +1,28 @@
+<app-brand-header></app-brand-header>
 <div class="qr-container">
-  <p class="eyebrow">You're registered</p>
-  <h1>This is your badge</h1>
-  <p class="subtitle">Screenshot it now — you'll need it to resume your session on any kiosk.</p>
 
-  <div class="ticket">
-    <div class="ticket-main">
-      <div class="qr-frame bracket-frame">
-        <img [src]="qrImageUrl" alt="Your QR Code" />
+
+  <div class="qr-content">
+    <p class="eyebrow">You're registered</p>
+    <h1>This is your badge</h1>
+    <p class="subtitle">Screenshot it now — you'll need it to resume your session on any kiosk.</p>
+
+    <div class="ticket">
+      <div class="ticket-main">
+        <div class="qr-frame bracket-frame">
+          <img [src]="qrImageUrl" alt="Your QR Code" />
+        </div>
+      </div>
+      <div class="ticket-perforation">
+        <span class="dot" *ngFor="let d of [1,2,3,4,5,6,7,8,9,10,11,12]"></span>
+      </div>
+      <div class="ticket-stub">
+        <img class="fan-icon" src="assets/img/turbine-fan-icon.png" alt="" />
+        <span class="stub-label">Badge ID</span>
+        <span class="stub-id">#{{ userId }}</span>
       </div>
     </div>
-    <div class="ticket-perforation">
-      <span class="dot" *ngFor="let d of [1,2,3,4,5,6,7,8,9,10,11,12]"></span>
-    </div>
-    <div class="ticket-stub">
-      <span class="stub-label">Badge ID</span>
-      <span class="stub-id">#{{ userId }}</span>
-    </div>
-  </div>
 
-  <button class="btn-primary" (click)="goToMenu()">Back to Registration →</button>
+    <button class="btn-primary" (click)="goToMenu()">Back to Registration →</button>
+  </div>
 </div>

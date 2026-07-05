@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { API_BASE_URL } from '../../constants';
+import { BrandHeader } from '../../shared/brand-header/brand-header';
 
 @Component({
   selector: 'app-qr-display',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BrandHeader],
   templateUrl: './qr-display.html',
   styleUrl: './qr-display.scss'
 })
