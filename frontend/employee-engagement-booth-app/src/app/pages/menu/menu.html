@@ -37,7 +37,7 @@
 
           <button
             class="btn-primary"
-            *ngIf="!progressMap[item.id] || progressMap[item.id] === 'not_started'"
+            *ngIf="item.content_type === 'video'"
             (click)="openContent(item)"
           >
             View content
@@ -45,7 +45,7 @@
 
           <button
             class="btn-primary"
-            *ngIf="progressMap[item.id] === 'viewed'"
+            *ngIf="!progressMap[item.id] || progressMap[item.id] === 'not_started' && item.content_type === 'quiz'"
             (click)="startQuiz(item)"
           >
             Start quiz

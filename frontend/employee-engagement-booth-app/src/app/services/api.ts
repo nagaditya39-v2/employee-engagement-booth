@@ -52,4 +52,8 @@ export class Api {
   getTestContentUrl(): string {
     return `${BASE_URL}/test-display`;
   }
+
+  getSideTopics(): Observable<any[]> {
+    return this.http.get<any[]>('assets/json/topics.json');
+  }
 }
