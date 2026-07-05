@@ -45,9 +45,7 @@ html, body {
    the photo regardless of scroll position. */
 body {
   font-family: var(--font-body);
-  background:
-    linear-gradient(rgba(4, 1, 90, 0.65), rgba(4, 1, 90, 0.65)),
-    var(--bg-photo);
+  background:  var(--bg-photo);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

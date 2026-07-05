@@ -14,16 +14,11 @@
     width: auto;
   }
 
-  &__logo {
-    height: 46px;
-    width: auto;
-  }
 }
 
 @media (max-width: 640px) {
   .brand-header {
     padding: 1.25rem 1.25rem;
     &__wordmark { height: 16px; }
-    &__logo { height: 34px; }
   }
 }
