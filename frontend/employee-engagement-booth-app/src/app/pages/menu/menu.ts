@@ -91,7 +91,8 @@ export class Menu implements OnInit, OnDestroy {
   launchContentWindow() {
     const { secondScreenX, secondScreenY, displayWidth, displayHeight } = DISPLAY_CONFIG;
     const windowFeatures = `left=${secondScreenX},top=${secondScreenY},width=${displayWidth},height=${displayHeight}`;
-    this.contentWindow = window.open('http://127.0.0.1:8000/test-display', 'content-window', windowFeatures);
+    const url = this.api.getTestContentUrl();
+    this.contentWindow = window.open(url, 'content-window', windowFeatures);
     this.cdr.detectChanges();
   }
 

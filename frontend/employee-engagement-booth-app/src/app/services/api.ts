@@ -48,4 +48,8 @@ export class Api {
   submitQuiz(userId: number, contentId: number): Observable<any> {
     return this.http.post(`${BASE_URL}/quiz/submit?user_id=${userId}&content_id=${contentId}`, {});
   }
+
+  getTestContentUrl(): string {
+    return `${BASE_URL}/test-display`;
+  }
 }
