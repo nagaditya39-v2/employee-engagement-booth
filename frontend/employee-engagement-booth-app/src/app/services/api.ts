@@ -61,4 +61,15 @@ export class Api {
   getSideTopics(): Observable<any[]> {
     return this.http.get<any[]>('assets/json/topics.json');
   }
+
+  getCardQuizzes(): Observable<any[]> {
+    return this.http.get<any[]>('assets/json/card-quizzes.json');
+  }
+
+  submitCardQuiz(contentId: number, userId: number, scoreEarned: number): Observable<any> {
+  return this.http.post(
+    `${BASE_URL}/content/${contentId}/submit-card-quiz?user_id=${userId}&score_earned=${scoreEarned}`,
+    {}
+  );
+}
 }

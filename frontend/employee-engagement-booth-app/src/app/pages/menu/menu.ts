@@ -55,7 +55,7 @@ export class Menu implements OnInit, OnDestroy {
     });
   }
 
-  // Content (video/webpage/interactive) still opens on the second monitor.
+  // Content (the card-1 video/topic picker) still opens on the second monitor.
   // The menu itself does not change pages or navigate away.
   openContent(item: any) {
     this.api.markViewed(item.id, this.userId).subscribe(() => {
@@ -66,15 +66,18 @@ export class Menu implements OnInit, OnDestroy {
     });
   }
 
-  // Quiz also opens on the second monitor (as a second instance of this SPA,
-  // routed to /quiz/:userId/:contentId) — never in the main kiosk window/router.
+  // Quiz-type cards also open on the second monitor. Card 1's quiz (reached
+  // via content-window, not this method) uses the generic MCQ /quiz page,
+  // since it's a real topic-tagged question pool. Cards 2-4 have no MCQ
+  // pool — they use the shared /card-quiz component (myth / emoji / match),
+  // driven by card-quizzes.json.
   startQuiz(item: any) {
     this.quizContentId = item.id;
     this.quizJustCompleted = false;
     this.progressMap[item.id] = 'quiz_assigned';
     this.cdr.detectChanges();
 
-    const quizUrl = `${window.location.origin}/quiz/${this.userId}/${item.id}`;
+    const quizUrl = `${window.location.origin}/card-quiz/${this.userId}/${item.id}`;
     this.openSecondScreen(quizUrl);
   }
 

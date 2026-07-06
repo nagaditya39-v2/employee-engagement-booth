@@ -1,0 +1,71 @@
+[
+  {
+    "contentId": 2,
+    "quizType": "myth",
+    "title": "AI MYTHBUSTERS",
+    "subtitle": "Identify whether the statement is Real or Myth",
+    "accent": "accent-blue",
+    "questions": [
+      {
+        "type": "myth",
+        "statement": "AI will replace all engineers in the next 5 years.",
+        "isMyth": true,
+        "funFact": "Myth! AI is a tool that augments engineers. It helps automate tasks, but human creativity, problem-solving, and decision-making remain irreplaceable."
+      },
+      {
+        "type": "myth",
+        "statement": "Generative AI models can produce inaccurate or fabricated information.",
+        "isMyth": false,
+        "funFact": "Real! This is known as 'hallucination' — always review and verify AI-generated content before using it for official work."
+      },
+      {
+        "type": "myth",
+        "statement": "AI models learn by memorizing every input verbatim, like a filing cabinet.",
+        "isMyth": true,
+        "funFact": "Myth! Models learn statistical patterns across huge datasets rather than storing exact copies of what they were trained on."
+      }
+    ]
+  },
+  {
+    "contentId": 3,
+    "quizType": "emoji",
+    "title": "EMOJI PUZZLE",
+    "subtitle": "Decode the emojis and type the correct answer",
+    "accent": "accent-orange",
+    "questions": [
+      {
+        "type": "emoji",
+        "emojis": ["🤖", "🧠", "⚙️"],
+        "answer": "machine learning",
+        "hint": "It's a technology that enables machines to think and learn like humans."
+      },
+      {
+        "type": "emoji",
+        "emojis": ["🔒", "💻", "🛡️"],
+        "answer": "cybersecurity",
+        "hint": "Keeping data and accounts safe from bad actors."
+      },
+      {
+        "type": "emoji",
+        "emojis": ["☁️", "📊", "🔗"],
+        "answer": "cloud computing",
+        "hint": "Storing and processing data somewhere other than your own laptop."
+      }
+    ]
+  },
+  {
+    "contentId": 4,
+    "quizType": "match",
+    "title": "MATCH THE TECH",
+    "subtitle": "Match the AI innovation with the correct description",
+    "accent": "accent-green",
+    "matchRound": {
+      "pairs": [
+        { "id": "A", "term": "Robotic Process Automation (RPA)", "imageUrl": "assets/img/match/rpa.jpg", "description": "Automates repetitive business tasks using software bots" },
+        { "id": "B", "term": "Digital Twin", "imageUrl": "assets/img/match/digital-twin.jpg", "description": "A virtual replica of a physical asset or process" },
+        { "id": "C", "term": "Voice Assistant", "imageUrl": "assets/img/match/voice-assistant.jpg", "description": "Understands and responds to voice commands" },
+        { "id": "D", "term": "Machine Learning", "imageUrl": "assets/img/match/machine-learning.jpg", "description": "Learns from data and makes predictions without being explicitly programmed" }
+      ]
+    }
+  }
+]

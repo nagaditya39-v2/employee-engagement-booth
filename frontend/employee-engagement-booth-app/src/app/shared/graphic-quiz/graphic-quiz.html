@@ -1,0 +1,147 @@
+<div class="graphic-quiz-page" [ngClass]="config?.accent">
+  <div class="quiz-container" *ngIf="!loading && config">
+
+    <div class="quiz-header">
+      <div class="header-text">
+        <p class="eyebrow">{{ config.title }}</p>
+        <h2>{{ config.subtitle }}</h2>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <span>⭐</span>
+          <div>
+            <small>Points</small>
+            <h3>{{ stats ? stats.total_score : '—' }}</h3>
+          </div>
+        </div>
+        <div class="stat">
+          <span>🏆</span>
+          <div>
+            <small>Rank</small>
+            <h3>{{ stats ? ('#' + stats.rank) : '—' }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MYTH / REAL ================= -->
+    <ng-container *ngIf="config.quizType === 'myth' && !complete">
+      <div class="quiz-card" *ngIf="asMyth(currentQuestion) as q">
+        <p class="progress">QUESTION {{ currentIndex + 1 }} OF {{ totalQuestions }}</p>
+
+        <div class="statement-card">
+          <p>{{ q.statement }}</p>
+        </div>
+
+        <p class="prompt">Is this statement Real or Myth?</p>
+
+        <div class="myth-buttons">
+          <button class="btn-real" [disabled]="answered" (click)="answerMyth(false)">✓ REAL</button>
+          <button class="btn-myth" [disabled]="answered" (click)="answerMyth(true)">✕ MYTH</button>
+        </div>
+
+        <div class="fact-box" *ngIf="answered">
+          <p class="fact-label" [class.correct]="wasCorrect" [class.incorrect]="!wasCorrect">
+            {{ wasCorrect ? '✅ Correct!' : '❌ Not quite' }}
+          </p>
+          <p class="fact-text">{{ q.funFact }}</p>
+          <button class="btn-next" (click)="next()">
+            {{ currentIndex === totalQuestions - 1 ? 'Finish' : 'Next →' }}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ================= EMOJI PUZZLE ================= -->
+    <ng-container *ngIf="config.quizType === 'emoji' && !complete">
+      <div class="quiz-card" *ngIf="asEmoji(currentQuestion) as q">
+        <p class="progress">QUESTION {{ currentIndex + 1 }} OF {{ totalQuestions }}</p>
+
+        <div class="emoji-row">
+          <ng-container *ngFor="let e of q.emojis; let last = last">
+            <span class="emoji">{{ e }}</span>
+            <span class="plus" *ngIf="!last">+</span>
+          </ng-container>
+          <span class="equals">=</span>
+          <span class="question-mark">?</span>
+        </div>
+
+        <label class="input-label">TYPE YOUR ANSWER</label>
+        <input
+          class="answer-input"
+          [(ngModel)]="emojiInput"
+          [disabled]="answered"
+          placeholder="Enter your answer here..."
+          autocomplete="off"
+          (keyup.enter)="submitEmojiAnswer()"
+        />
+
+        <div class="hint-box">
+          <button class="hint-toggle" (click)="toggleHint()">💡 Hint</button>
+          <p class="hint-text" *ngIf="showHint">{{ q.hint }}</p>
+        </div>
+
+        <button class="btn-submit" *ngIf="!answered" [disabled]="!emojiInput.trim()" (click)="submitEmojiAnswer()">
+          Submit Answer
+        </button>
+
+        <div class="fact-box" *ngIf="answered">
+          <p class="fact-label" [class.correct]="wasCorrect" [class.incorrect]="!wasCorrect">
+            {{ wasCorrect ? '✅ Correct!' : ('❌ The answer was: ' + q.answer) }}
+          </p>
+          <button class="btn-next" (click)="next()">
+            {{ currentIndex === totalQuestions - 1 ? 'Finish' : 'Next →' }}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ================= MATCH THE TECH ================= -->
+    <ng-container *ngIf="config.quizType === 'match' && !complete">
+      <div class="quiz-card match-card" *ngIf="config.matchRound as round">
+        <p class="prompt">Match the AI innovation on the left with the correct description on the right.</p>
+
+        <div class="match-grid">
+          <div class="match-col terms">
+            <div
+              class="match-item term"
+              *ngFor="let p of round.pairs; let i = index"
+              [class.selected]="selectedTermId === p.id"
+              [class.matched]="isTermMatched(p.id)"
+              [style.borderColor]="isTermMatched(p.id) ? matchColor(p.id) : null"
+              (click)="selectTerm(p.id)"
+            >
+              <span class="term-index">{{ i + 1 }}</span>
+              <img [src]="p.imageUrl" alt="" (error)="onImageError($event)" />
+              <span class="term-label">{{ p.term }}</span>
+            </div>
+          </div>
+
+          <div class="match-col descriptions">
+            <div
+              class="match-item description"
+              *ngFor="let p of shuffledDescriptions"
+              [class.matched]="isDescMatched(p.id)"
+              [style.borderColor]="isDescMatched(p.id) ? matchColor(p.id) : null"
+              (click)="selectDescription(p.id)"
+            >
+              <span class="desc-letter">{{ p.id }}</span>
+              <span class="desc-text">{{ p.description }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ================= RESULT ================= -->
+    <div class="quiz-card result" *ngIf="complete">
+      <h2>{{ wasCorrect || score > 0 ? 'Nice work!' : 'Round complete' }}</h2>
+      <p>You scored <strong>{{ score }}</strong> points on this round.</p>
+    </div>
+
+  </div>
+
+  <div class="quiz-container" *ngIf="!loading && !config">
+    <p class="error-text">No quiz configured for this card yet.</p>
+  </div>
+</div>

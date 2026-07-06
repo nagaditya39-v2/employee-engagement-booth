@@ -1,37 +1,32 @@
 [
   {
-    "id": 1,
-    "title": "What is AI?",
-    "video_url": "https://youtu.be/nhh0r77eJ2s?si=RC4OUZfclyLTPHFY"
+    "id": "ai-basics",
+    "title": "What Is Generative AI?",
+    "videoId": "Y8Tjs7RkqWo",
+    "description": "A quick primer on how generative AI models learn and create content."
   },
   {
-    "id": 2,
-    "title": "What is a Digital Twin?",
-    "video_url": "https://youtu.be/76wwdorAz38?si=cBBsnuzgnOQ17nlR"
+    "id": "cybersecurity",
+    "title": "Cybersecurity Basics",
+    "videoId": "fB7GxF7jA_4",
+    "description": "The everyday habits that keep company data and accounts safe."
   },
   {
-    "id": 3,
-    "title": "How Predictive Analytics Works",
-    "video_url": "https://example.com/video3"
+    "id": "sustainability",
+    "title": "Sustainability at Work",
+    "videoId": "d7Dm5EoMCEw",
+    "description": "Small daily choices that add up to a big environmental impact."
   },
   {
-    "id": 4,
-    "title": "Cloud Computing Explained",
-    "video_url": "https://example.com/video4"
+    "id": "innovation",
+    "title": "Innovation Mindset",
+    "videoId": "gkZJ6x6kloY",
+    "description": "How great ideas move from a napkin sketch to reality."
   },
   {
-    "id": 5,
-    "title": "Cybersecurity Essentials",
-    "video_url": "https://example.com/video5"
-  },
-  {
-    "id": 6,
-    "title": "Generative AI in Engineering",
-    "video_url": "https://example.com/video6"
-  },
-  {
-    "id": 7,
-    "title": "IoT Fundamentals",
-    "video_url": "https://example.com/video7"
+    "id": "teamwork",
+    "title": "The Power of Teamwork",
+    "videoId": "uFO7vOi2mKU",
+    "description": "Why diverse teams solve problems faster and better."
   }
 ]

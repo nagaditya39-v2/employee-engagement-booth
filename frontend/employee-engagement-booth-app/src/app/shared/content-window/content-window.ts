@@ -25,12 +25,23 @@ export class ContentWindow {
   topics: Topic[] = [];
   loadingTopics = true;
 
+  // True while we're checking the backend for an existing topic lock —
+  // guards against briefly flashing the pick-a-topic grid before we know
+  // whether this user already chose one (possibly on a different kiosk).
+  checkingProgress = true;
+
   // Topic the user is currently previewing (not locked in yet)
   previewTopicId: string | null = null;
 
-  // Topic locked in — once set, this is the only content the user can see
+  // Topic locked in — once set, this is the only content the user can see.
+  // Can be set either by confirmSelection() (fresh pick) or by
+  // resolveLockedTopicFromBackend() (returning to an already-locked session).
   lockedTopic: Topic | null = null;
   safeVideoUrl: SafeResourceUrl | null = null;
+
+  // True if the backend says this user already finished the quiz for this
+  // topic — in that case we don't offer "take the quiz" again.
+  alreadyCompleted = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -48,10 +59,62 @@ export class ContentWindow {
       next: (topics: Topic[]) => {
         this.topics = topics;
         this.loadingTopics = false;
-        this.cdr.detectChanges();
+        this.checkExistingLock();
       },
       error: () => {
         this.loadingTopics = false;
+        this.checkExistingLock();
+      }
+    });
+  }
+
+  // Looks up this user's Progress row for this content item. If they've
+  // already moved past "picking a topic" (quiz_assigned or quiz_completed),
+  // we must not show the topic grid again — a topic choice, once locked, is
+  // final, matching the same "no reroll" rule the quiz itself already
+  // enforces. Resolves which topic via the already-assigned questions'
+  // topic_key, since that's stored server-side and works from any kiosk.
+  private checkExistingLock() {
+    this.api.getUserProgress(this.userId).subscribe({
+      next: (progressList: any[]) => {
+        const progress = progressList.find((p) => p.content_id === this.contentId);
+
+        if (progress && (progress.status === 'quiz_assigned' || progress.status === 'quiz_completed')) {
+          this.resolveLockedTopicFromBackend(progress.status);
+        } else {
+          this.checkingProgress = false;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.checkingProgress = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Safe to call here specifically because attempts are already guaranteed
+  // to exist (status check above) — start-quiz is idempotent and will
+  // return the existing assigned questions rather than drawing a fresh,
+  // untagged batch. Calling this BEFORE a topic is picked would be unsafe.
+  private resolveLockedTopicFromBackend(status: string) {
+    this.api.startQuiz(this.contentId, this.userId).subscribe({
+      next: (assigned: any[]) => {
+        const topicKey = assigned?.[0]?.topic_key;
+        const topic = this.topics.find((t) => t.id === topicKey) ?? null;
+
+        if (topic) {
+          this.lockedTopic = topic;
+          this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+            `https://www.youtube-nocookie.com/embed/${topic.videoId}?rel=0&modestbranding=1`
+          );
+        }
+        this.alreadyCompleted = status === 'quiz_completed';
+        this.checkingProgress = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.checkingProgress = false;
         this.cdr.detectChanges();
       }
     });

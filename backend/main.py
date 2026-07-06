@@ -217,59 +217,61 @@ def test_display():
     return HTMLResponse("""
         <html>
         <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <link rel="preconnect" href="https://fonts.googleapis.com">
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-          <style>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+        <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
             body {
-              background:
-                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(43,84,255,0.22), transparent),
-                #090b16;
-              color: #f3f4ff;
-              font-family: 'Inter', sans-serif;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              height: 100vh;
-              text-align: center;
-              gap: 1rem;
+            background: url('/assets/img/bg-photo.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #f3f4ff;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            gap: 1rem;
             }
             .pulse {
-              width: 64px; height: 64px;
-              border-radius: 18px;
-              border: 1.5px solid #3a4180;
-              background: linear-gradient(160deg, #171b3a, #11142a);
-              display: flex; align-items: center; justify-content: center;
-              font-size: 1.6rem;
-              color: #5b7fff;
-              box-shadow: 0 0 0 1px rgba(43,84,255,0.08), 0 20px 50px -20px rgba(43,84,255,0.45);
-              animation: glow 2.4s ease-in-out infinite;
+            width: 64px; height: 64px;
+            border-radius: 18px;
+            border: 1.5px solid #3a4180;
+            background: linear-gradient(160deg, #171b3a, #11142a);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 0 1px rgba(43,84,255,0.08), 0 20px 50px -20px rgba(43,84,255,0.45);
+            animation: glow 2.4s ease-in-out infinite;
             }
+            .pulse img { width: 32px; height: 32px; }
             @keyframes glow {
-              0%, 100% { box-shadow: 0 0 0 1px rgba(43,84,255,0.08), 0 20px 50px -20px rgba(43,84,255,0.45); }
-              50% { box-shadow: 0 0 0 1px rgba(43,84,255,0.16), 0 20px 60px -15px rgba(43,84,255,0.65); }
+            0%, 100% { box-shadow: 0 0 0 1px rgba(43,84,255,0.08), 0 20px 50px -20px rgba(43,84,255,0.45); }
+            50% { box-shadow: 0 0 0 1px rgba(43,84,255,0.16), 0 20px 60px -15px rgba(43,84,255,0.65); }
             }
             h1 {
-              font-family: 'Space Grotesk', sans-serif;
-              font-weight: 600;
-              font-size: 1.6rem;
-              letter-spacing: -0.01em;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1.6rem;
+            letter-spacing: -0.01em;
             }
             p {
-              color: #9298c2;
-              font-size: 0.95rem;
-              max-width: 360px;
+            color: #9298c2;
+            font-size: 0.95rem;
+            max-width: 360px;
             }
             @media (prefers-reduced-motion: reduce) {
-              .pulse { animation: none; }
+            .pulse { animation: none; }
             }
-          </style>
+        </style>
         </head>
         <body>
-            <div class="pulse">⌁</div>
+            <div class="pulse"><img src="/favicon.ico" alt="" /></div>
             <h1>Display ready</h1>
             <p>Choose an activity on the kiosk to load it here.</p>
         </body>
@@ -458,6 +460,66 @@ async def submit_quiz(user_id: int, content_id: int, db: Session = Depends(get_d
         total_score=user.total_score,
         status=progress.status
     )
+
+@app.post("/content/{content_id}/submit-card-quiz", response_model=schemas.QuizResult)
+async def submit_card_quiz(
+    content_id: int,
+    user_id: int,
+    score_earned: int,
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.Users).filter(models.Users.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    content = db.query(models.ContentItems).filter(models.ContentItems.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="Content item not found")
+
+    progress = db.query(models.Progress).filter(
+        models.Progress.user_id == user_id,
+        models.Progress.content_id == content_id
+    ).first()
+
+    if progress and progress.status == "quiz_completed":
+        # Idempotent — mirrors start-quiz's "no reroll" rule. Return existing
+        # state rather than erroring, since the frontend calls this from a
+        # postMessage handshake that shouldn't crash if it double-fires.
+        return schemas.QuizResult(
+            content_id=content_id,
+            score_earned=progress.score_till_now,
+            total_score=user.total_score,
+            status=progress.status
+        )
+
+    if progress:
+        progress.status = "quiz_completed"
+        progress.score_till_now = score_earned
+    else:
+        progress = models.Progress(
+            user_id=user_id,
+            content_id=content_id,
+            status="quiz_completed",
+            score_till_now=score_earned
+        )
+        db.add(progress)
+
+    user.total_score = (user.total_score or 0) + score_earned
+    db.commit()
+
+    all_users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
+    standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in all_users]
+    await manager.broadcast(standings)
+
+    logger.info(f"Card quiz submitted — user {user_id}, content {content_id}, score {score_earned}")
+
+    return schemas.QuizResult(
+        content_id=content_id,
+        score_earned=score_earned,
+        total_score=user.total_score,
+        status=progress.status
+    )
+
 
 static_dir = os.path.join(os.path.dirname(__file__), "../frontend/employee-engagement-booth-app/dist/employee-engagement-booth-app/browser")
 
