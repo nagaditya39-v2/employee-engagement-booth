@@ -183,3 +183,39 @@ h2 {
     font-family: var(--font-mono);
   }
 }
+
+.stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.75rem 1.25rem;
+
+  span {
+    font-size: 1.5rem;
+  }
+
+  small {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+}

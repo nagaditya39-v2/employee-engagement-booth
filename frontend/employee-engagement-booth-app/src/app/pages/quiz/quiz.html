@@ -1,6 +1,24 @@
 
 <div class="quiz-page">
   <div class="quiz-container">
+    <div class="stats">
+      <div class="stat">
+        <span>⭐</span>
+        <div>
+          <small>Points</small>
+          <h3>1250</h3>
+        </div>
+      </div>
+
+      <div class="stat">
+        <span>🏆</span>
+        <div>
+          <small>Rank</small>
+          <h3>12</h3>
+        </div>
+      </div>
+    </div>
+
     <p class="error" *ngIf="error">{{ error }}</p>
 
     <ng-container *ngIf="!result && currentQuestion">
