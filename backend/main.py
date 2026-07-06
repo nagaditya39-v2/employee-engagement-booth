@@ -271,7 +271,7 @@ def test_display():
         </style>
         </head>
         <body>
-            <div class="pulse"><img src="/favicon.ico" alt="" /></div>
+            <div class="pulse"><img src="/assets/img/turbine-fan-icon.png" alt="" /></div>
             <h1>Display ready</h1>
             <p>Choose an activity on the kiosk to load it here.</p>
         </body>
