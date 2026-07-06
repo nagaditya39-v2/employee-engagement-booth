@@ -58,6 +58,9 @@ export class Menu implements OnInit, OnDestroy {
   // Content (the card-1 video/topic picker) still opens on the second monitor.
   // The menu itself does not change pages or navigate away.
   openContent(item: any) {
+    if (!this.canOpenContent(item.id)) {
+      return;
+    }
     this.api.markViewed(item.id, this.userId).subscribe(() => {
       this.progressMap[item.id] = 'viewed';
       this.cdr.detectChanges();
@@ -65,6 +68,12 @@ export class Menu implements OnInit, OnDestroy {
       this.openSecondScreen(url);
     });
   }
+
+  canOpenContent(contentId: number): boolean {
+    const status = this.progressMap[contentId];
+    return !status || status === 'not_started';
+  }
+    
 
   // Quiz-type cards also open on the second monitor. Card 1's quiz (reached
   // via content-window, not this method) uses the generic MCQ /quiz page,

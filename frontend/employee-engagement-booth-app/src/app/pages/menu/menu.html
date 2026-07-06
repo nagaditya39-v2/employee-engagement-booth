@@ -37,9 +37,8 @@
 
           <button
             class="btn-primary"
-            *ngIf="item.content_type === 'video'"
-            (click)="openContent(item)"
-          >
+            *ngIf="item.content_type === 'video' && canOpenContent(item.id)"
+            (click)="openContent(item)">
             View content
           </button>
 
