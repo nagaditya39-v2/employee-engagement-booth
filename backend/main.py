@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
-from typing import List
+from typing import List, Optional
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
@@ -277,7 +277,7 @@ def test_display():
     """)
 
 @app.post("/content/{content_id}/start-quiz", response_model=List[schemas.AssignedQuestionOut])
-def start_quiz(content_id: int, user_id: int, db: Session = Depends(get_db)):
+def start_quiz(content_id: int, user_id: int, topic: Optional[str] = None, db: Session = Depends(get_db)):
     content = db.query(models.ContentItems).filter(models.ContentItems.id == content_id).first()
     if not content:
         raise HTTPException(status_code=404, detail="Content item not found")
@@ -299,6 +299,7 @@ def start_quiz(content_id: int, user_id: int, db: Session = Depends(get_db)):
             schemas.AssignedQuestionOut(
                 question_id=q.id,
                 content_id=content_id,
+                topic_key=q.topic_key,
                 question_text=q.question_text,
                 option_a=q.option_a,
                 option_b=q.option_b,
@@ -310,8 +311,16 @@ def start_quiz(content_id: int, user_id: int, db: Session = Depends(get_db)):
             for a, q in existing_attempts
         ]
 
-    # Draw fresh questions from the pool
-    pool = db.query(models.QuizQuestions).filter(models.QuizQuestions.content_id == content_id).all()
+    # Draw fresh questions from the pool, preferring topic-specific questions
+    # when a topic was passed (falls back to the full content-item pool if
+    # that topic has no questions tagged, so nothing ever breaks).
+    base_query = db.query(models.QuizQuestions).filter(models.QuizQuestions.content_id == content_id)
+    pool = []
+    if topic:
+        pool = base_query.filter(models.QuizQuestions.topic_key == topic).all()
+    if not pool:
+        pool = base_query.all()
+
     if not pool:
         raise HTTPException(status_code=400, detail="No questions available for this content item")
 
@@ -353,6 +362,7 @@ def start_quiz(content_id: int, user_id: int, db: Session = Depends(get_db)):
         schemas.AssignedQuestionOut(
             question_id=q.id,
             content_id=content_id,
+            topic_key=q.topic_key,
             question_text=q.question_text,
             option_a=q.option_a,
             option_b=q.option_b,
@@ -363,7 +373,6 @@ def start_quiz(content_id: int, user_id: int, db: Session = Depends(get_db)):
         )
         for q in assigned
     ]
-
 
 @app.post("/quiz/answer", response_model=schemas.AssignedQuestionOut)
 def answer_question(payload: schemas.AnswerSubmit, db: Session = Depends(get_db)):
@@ -392,6 +401,7 @@ def answer_question(payload: schemas.AnswerSubmit, db: Session = Depends(get_db)
     return schemas.AssignedQuestionOut(
         question_id=question.id,
         content_id=attempt.content_id,
+        topic_key=question.topic_key,
         question_text=question.question_text,
         option_a=question.option_a,
         option_b=question.option_b,
@@ -467,3 +477,19 @@ def serve_spa(full_path: str):
     if "." in os.path.basename(full_path):
         raise HTTPException(status_code=404, detail=f"Static asset not found: {full_path}")
     return FileResponse(index_path)
+
+@app.get("/users/{user_id}/stats", response_model=schemas.UserStatsOut)
+def get_user_stats(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Users).filter(models.Users.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    all_users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
+    rank = next((i + 1 for i, u in enumerate(all_users) if u.id == user_id), len(all_users))
+
+    return schemas.UserStatsOut(
+        user_id=user.id,
+        total_score=user.total_score or 0,
+        rank=rank,
+        total_users=len(all_users)
+    )

@@ -14,12 +14,16 @@ import { API_BASE_URL } from '../../constants';
 export class Quiz implements OnInit {
   userId: number = 0;
   contentId: number = 0;
+  topicId: string | null = null;
+
   questions: any[] = [];
   currentIndex: number = 0;
   selectedOption: string | null = null;
   submitting: boolean = false;
   result: any = null;
   error: string = '';
+
+  stats: { total_score: number; rank: number; total_users: number } | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -30,11 +34,26 @@ export class Quiz implements OnInit {
   ngOnInit() {
     this.userId = Number(this.route.snapshot.paramMap.get('userId'));
     this.contentId = Number(this.route.snapshot.paramMap.get('contentId'));
+    this.topicId = this.route.snapshot.queryParamMap.get('topic');
     this.loadQuiz();
+    this.loadStats();
+  }
+
+  loadStats() {
+    this.api.getUserStats(this.userId).subscribe({
+      next: (stats) => {
+        this.stats = stats;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        // Non-fatal — the quiz still works without the stats bar.
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   loadQuiz() {
-    this.api.startQuiz(this.contentId, this.userId).subscribe({
+    this.api.startQuiz(this.contentId, this.userId, this.topicId || undefined).subscribe({
       next: (questions: any[]) => {
         this.questions = questions;
         // Resume at the first unanswered question, in case the window was reopened mid-quiz
@@ -88,6 +107,13 @@ export class Quiz implements OnInit {
       next: (result) => {
         this.result = result;
         this.cdr.detectChanges();
+
+        // Reflect the new score immediately in the stats bar, then refresh
+        // rank from the backend since other users' scores may have moved too.
+        if (this.stats) {
+          this.stats = { ...this.stats, total_score: result.total_score };
+        }
+        this.loadStats();
 
         // Tell the kiosk (main) window the quiz is done — it owns the
         // actual reset-to-login behavior, not this window.

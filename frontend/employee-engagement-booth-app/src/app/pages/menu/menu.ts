@@ -61,7 +61,7 @@ export class Menu implements OnInit, OnDestroy {
     this.api.markViewed(item.id, this.userId).subscribe(() => {
       this.progressMap[item.id] = 'viewed';
       this.cdr.detectChanges();
-      const url = `${window.location.origin}/content-window/`;
+      const url = `${window.location.origin}/content-window/${this.userId}/${item.id}`;
       this.openSecondScreen(url);
     });
   }

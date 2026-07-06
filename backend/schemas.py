@@ -1,3 +1,4 @@
+# backend/schemas.py
 from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel
@@ -41,6 +42,7 @@ class ProgressSummary(BaseModel):
 class AssignedQuestionOut(BaseModel):
     question_id: int
     content_id: int
+    topic_key: Optional[str] = None
     question_text: str
     option_a: str
     option_b: str
@@ -79,6 +81,16 @@ class QuizResult(BaseModel):
     score_earned: int
     total_score: int
     status: str
+
+    class Config:
+        from_attributes = True
+
+
+class UserStatsOut(BaseModel):
+    user_id: int
+    total_score: int
+    rank: int
+    total_users: int
 
     class Config:
         from_attributes = True

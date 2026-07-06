@@ -16,5 +16,5 @@ export const routes: Routes = [
   { path: 'leaderboard', component: Leaderboard },
   { path: 'qr/:userId/:qrCode', component: QrDisplay },
   { path: 'quiz/:userId/:contentId', component: Quiz },
-  { path: 'content-window', component: ContentWindow },
+  { path: 'content-window/:userId/:contentId', component: ContentWindow },
 ];

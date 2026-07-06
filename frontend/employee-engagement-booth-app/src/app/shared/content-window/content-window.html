@@ -1,75 +1,69 @@
 <div class="content-container">
-	<!-- ================= POPUP ================= -->
 
-	<div class="overlay" *ngIf="showTopicPopup">
-		<div class="topic-popup">
-			<h2>Select a Topic</h2>
+  <button class="back-btn" (click)="backButton()">← Back To Resume Session</button>
 
-			<p>Please choose a topic before continuing.</p>
+  <!-- ================= PICK-A-TOPIC STATE ================= -->
+  <ng-container *ngIf="!lockedTopic">
+    <div class="header">
+      <div>
+        <h1>TEACH ME IN 60 SECONDS</h1>
+        <p>Preview each topic below, then pick the one you want to learn. Once you select a topic, you won't be able to switch — so take a look around first.</p>
+      </div>
+    </div>
 
-			<div class="topic-list">
-				<button *ngFor="let topic of topics" class="popup-topic" [class.selected]="selectedTopicId === topic.id"
-					(click)="selectTopic(topic.id)">
-					{{ topic.title }}
-				</button>
-			</div>
+    <p class="loading" *ngIf="loadingTopics">Loading topics…</p>
 
-			<button class="continue-btn" [disabled]="selectedTopicId === null" (click)="startLearning()">
-				Start Learning
-			</button>
-		</div>
-	</div>
+    <div class="topic-grid" *ngIf="!loadingTopics">
+      <div
+        class="topic-card"
+        *ngFor="let topic of topics"
+        [class.previewed]="isPreviewed(topic)"
+        (click)="previewTopic(topic)"
+      >
+        <img class="topic-thumb" [src]="thumbnailUrl(topic)" alt="" />
+        <div class="topic-info">
+          <h3>{{ topic.title }}</h3>
+          <p>{{ topic.description }}</p>
+        </div>
+        <div class="topic-check" *ngIf="isPreviewed(topic)">✓ Selected</div>
+      </div>
+    </div>
 
-	<!-- ================= PAGE ================= -->
+    <div class="confirm-bar" *ngIf="previewTopicId">
+      <button class="continue-btn" (click)="confirmSelection()">
+        Start Learning →
+      </button>
+      <p class="confirm-hint">This choice is final for this session.</p>
+    </div>
+  </ng-container>
 
-	<div class="page-content" [class.disabled]="showTopicPopup">
-		<!-- Header -->
+  <!-- ================= LOCKED-IN VIDEO STATE ================= -->
+  <ng-container *ngIf="lockedTopic">
+    <div class="header">
+      <div>
+        <small class="eyebrow">NOW LEARNING</small>
+        <h1>{{ lockedTopic.title }}</h1>
+        <p>{{ lockedTopic.description }}</p>
+      </div>
+    </div>
 
-		<button class="back-btn" (click)="backButton()">← Back To Resume Session</button>
+    <div class="video-card">
+      <div class="video-frame">
+        <iframe
+          [src]="safeVideoUrl"
+          title="{{ lockedTopic.title }}"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
 
-		<div class="header">
-			<div>
-				<h1>1. TEACH ME IN 60 SECONDS</h1>
-				<p>Select a topic and watch a 60-second video</p>
-			</div>
-		</div>
+    <div class="footer">
+      <button class="start-btn" (click)="goToQuiz()">
+        ✅ I've finished — take the quiz
+      </button>
+    </div>
+  </ng-container>
 
-		<!-- Body -->
-
-		<div class="content-body">
-			<!-- Sidebar -->
-
-			<aside class="sidebar">
-				<div class="sidebar-title">TEACH ME IN 60 SECONDS</div>
-
-				<button *ngFor="let topic of topics" class="topic" [class.active]="topic.id === activeTopicId" [class.inActive]="topic.id !== activeTopicId">
-					{{ topic.title }}
-				</button>
-			</aside>
-
-			<!-- Main -->
-
-			<section class="main">
-				<div class="video-card">
-					<div class="video-header">
-						<div>
-							<small>NOW PLAYING</small>
-							<h2>{{ selectedTitle || 'Select a topic' }}</h2>
-						</div>
-
-						<div class="timer">
-							<span>60</span>
-							<small>SECONDS</small>
-						</div>
-					</div>
-
-					<div class="video-placeholder">
-						<video controls>
-							<source [src]="selectedVideoUrl" type="video/mp4">
-						</video>
-					</div>
-				</div>
-			</section>
-		</div>
-	</div>
 </div>

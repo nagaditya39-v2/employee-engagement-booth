@@ -1,3 +1,4 @@
+# backend/models.py
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, UniqueConstraint
 from sqlalchemy.sql import func
 from database import Base
@@ -25,6 +26,7 @@ class QuizQuestions(Base):
 
     id = Column(Integer, primary_key=True)
     content_id = Column(Integer, ForeignKey("content_items.id"), nullable=False)
+    topic_key = Column(String, nullable=True, index=True)  # NEW — ties a question to one video/topic within a content item
     question_text = Column(String, nullable=False)
     option_a = Column(String, nullable=False)
     option_b = Column(String, nullable=False)

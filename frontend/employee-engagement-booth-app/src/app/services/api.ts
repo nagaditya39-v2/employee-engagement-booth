@@ -33,9 +33,10 @@ export class Api {
     return this.http.get<any[]>(`${BASE_URL}/progress/${userId}`);
   }
 
-  startQuiz(contentId: number, userId: number): Observable<any[]> {
-  return this.http.post<any[]>(`${BASE_URL}/content/${contentId}/start-quiz?user_id=${userId}`, {});
-}
+  startQuiz(contentId: number, userId: number, topicId?: string): Observable<any[]> {
+    const topicParam = topicId ? `&topic=${encodeURIComponent(topicId)}` : '';
+    return this.http.post<any[]>(`${BASE_URL}/content/${contentId}/start-quiz?user_id=${userId}${topicParam}`, {});
+  }
 
   submitAnswer(userId: number, questionId: number, selectedOption: string): Observable<any> {
     return this.http.post(`${BASE_URL}/quiz/answer`, {
@@ -47,6 +48,10 @@ export class Api {
 
   submitQuiz(userId: number, contentId: number): Observable<any> {
     return this.http.post(`${BASE_URL}/quiz/submit?user_id=${userId}&content_id=${contentId}`, {});
+  }
+
+  getUserStats(userId: number): Observable<any> {
+    return this.http.get(`${BASE_URL}/users/${userId}/stats`);
   }
 
   getTestContentUrl(): string {

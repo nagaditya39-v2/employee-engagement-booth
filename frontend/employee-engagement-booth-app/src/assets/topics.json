@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ai-basics",
+    "title": "What Is Generative AI?",
+    "videoId": "REPLACE_WITH_YOUTUBE_ID_1",
+    "description": "A 60-second primer on how generative AI models learn and create content."
+  },
+  {
+    "id": "cybersecurity",
+    "title": "Cybersecurity Basics",
+    "videoId": "REPLACE_WITH_YOUTUBE_ID_2",
+    "description": "The everyday habits that keep company data and accounts safe."
+  },
+  {
+    "id": "sustainability",
+    "title": "Sustainability at Work",
+    "videoId": "REPLACE_WITH_YOUTUBE_ID_3",
+    "description": "Small daily choices that add up to a big environmental impact."
+  },
+  {
+    "id": "innovation",
+    "title": "Innovation Mindset",
+    "videoId": "REPLACE_WITH_YOUTUBE_ID_4",
+    "description": "How great ideas move from a napkin sketch to reality."
+  },
+  {
+    "id": "teamwork",
+    "title": "The Power of Teamwork",
+    "videoId": "REPLACE_WITH_YOUTUBE_ID_5",
+    "description": "Why diverse teams solve problems faster and better."
+  }
+]
