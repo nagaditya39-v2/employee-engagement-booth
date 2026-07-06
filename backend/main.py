@@ -49,11 +49,22 @@ class ConnectionManager:
         self.active_connections.append(websocket)
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        try:
+            self.active_connections.remove(websocket)
+        except ValueError:
+            pass
 
     async def broadcast(self, data: dict):
-        for connection in self.active_connections:
-            await connection.send_json(data)
+        # iterate over a copy so we can remove on error
+        for connection in list(self.active_connections):
+            try:
+                await connection.send_json(data)
+            except Exception as e:
+                logger.debug(f"Removing broken websocket {getattr(connection, 'client', None)}: {e}")
+                try:
+                    self.active_connections.remove(connection)
+                except ValueError:
+                    pass
 
 manager = ConnectionManager()
 
@@ -62,16 +73,23 @@ manager = ConnectionManager()
 async def leaderboard_ws(websocket: WebSocket, db: Session = Depends(get_db)):
     await manager.connect(websocket)
     try:
-        # Send current standings immediately on connect
         users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
         standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in users]
         await websocket.send_json(standings)
         logger.info(f"Leaderboard WS connected: {websocket.client}")
-        # Keep connection alive, wait for client to disconnect
         while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
+            try:
+                await websocket.receive_text()
+            except WebSocketDisconnect:
+                break
+            except Exception as e:
+                logger.debug(f"WS receive error (client {websocket.client}): {e}")
+                break
+    finally:
+        try:
+            manager.disconnect(websocket)
+        except Exception:
+            pass
 
 @app.post("/register", response_model=schemas.UserOut)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -450,8 +468,10 @@ async def submit_quiz(user_id: int, content_id: int, db: Session = Depends(get_d
     # Broadcast updated standings to leaderboard
     all_users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
     standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in all_users]
-    await manager.broadcast(standings)
-
+    try:
+        await manager.broadcast(standings)
+    except Exception:
+        logger.exception("Failed to broadcast standings (non-fatal)")
     logger.info(f"Quiz submitted — user {user_id}, content {content_id}, score {score_earned}")
 
     return schemas.QuizResult(
@@ -509,7 +529,10 @@ async def submit_card_quiz(
 
     all_users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
     standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in all_users]
-    await manager.broadcast(standings)
+    try:
+        await manager.broadcast(standings)
+    except Exception:
+        logger.exception("Failed to broadcast standings (non-fatal)")
 
     logger.info(f"Card quiz submitted — user {user_id}, content {content_id}, score {score_earned}")
 

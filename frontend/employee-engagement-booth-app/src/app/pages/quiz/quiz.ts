@@ -133,7 +133,18 @@ export class Quiz implements OnInit {
       error: (err) => {
         this.error = err.error?.detail || 'Could not submit quiz';
         this.cdr.detectChanges();
-      }
+
+        // still notify kiosk and revert second screen
+        if (window.opener) {
+          window.opener.postMessage(
+            { type: 'quiz-complete', userId: this.userId, contentId: this.contentId, result: { score_earned: 0 } },
+            '*'
+          );
+        }
+        setTimeout(() => {
+          window.location.href = `${API_BASE_URL}/test-display`;
+        }, 4000);
+}
     });
   }
 }
