@@ -173,7 +173,9 @@ export class GraphicQuiz implements OnInit {
       const allCorrect = round.pairs.every((p) => this.matchedPairs[p.id] === p.id);
       this.wasCorrect = allCorrect;
       if (allCorrect) this.score += 10 * round.pairs.length;
-      this.complete = true;
+      // Submit score and perform the same end-of-quiz flow as other quiz types
+      this.finish();
+      return;
     }
     this.cdr.detectChanges();
   }
