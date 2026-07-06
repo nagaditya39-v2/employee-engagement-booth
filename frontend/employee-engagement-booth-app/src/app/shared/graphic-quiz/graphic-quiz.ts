@@ -217,10 +217,16 @@ export class GraphicQuiz implements OnInit {
     this.cdr.detectChanges();
 
     this.api.submitCardQuiz(this.contentId, this.userId, this.score).subscribe({
-      next: () => this.notifyKioskAndReset(),
-      error: () => this.notifyKioskAndReset(), // non-fatal — kiosk flow shouldn't hang on a scoring failure
+      next: () => {
+        this.loadStats();                 // refresh points/rank from DB
+        this.notifyKioskAndReset();
+      },
+      error: () => {
+        this.loadStats();                 // still refresh on error path
+        this.notifyKioskAndReset();
+      },
     });
-  }
+}
 
   private notifyKioskAndReset() {
     if (window.opener) {
