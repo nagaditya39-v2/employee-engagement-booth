@@ -7,6 +7,7 @@ import { QrDisplay } from './pages/qr-display/qr-display';
 import { Quiz } from './pages/quiz/quiz';
 import { ContentWindow } from './shared/content-window/content-window';
 import { GraphicQuiz } from './shared/graphic-quiz/graphic-quiz';
+import { Complete } from './pages/complete/complete';
 
 
 export const routes: Routes = [
@@ -19,4 +20,5 @@ export const routes: Routes = [
   { path: 'quiz/:userId/:contentId', component: Quiz },
   { path: 'content-window/:userId/:contentId', component: ContentWindow },
   { path: 'card-quiz/:userId/:contentId', component: GraphicQuiz },
+  { path: 'complete/:userId', component: Complete },
 ];

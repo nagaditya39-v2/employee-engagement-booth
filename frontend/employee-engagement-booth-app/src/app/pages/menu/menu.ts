@@ -17,10 +17,13 @@ export class Menu implements OnInit, OnDestroy {
   progressMap: { [contentId: number]: string } = {};
   contentWindow: Window | null = null;
 
-  // Set while a quiz is running on the second monitor, so this (main) window
-  // can show "in progress" and ignore other clicks until it resolves.
+  // to let menu second scren is open and shows inprogress
   quizContentId: number | null = null;
   quizJustCompleted: boolean = false;
+
+  // final state after completing all stuff
+  contentLoaded = false;
+  progressLoaded = false;
 
   private messageHandler = (event: MessageEvent) => this.handleSecondScreenMessage(event);
 
@@ -44,14 +47,35 @@ export class Menu implements OnInit, OnDestroy {
   loadMenu() {
     this.api.getContent().subscribe((items: any[]) => {
       this.contentItems = items;
+      this.contentLoaded = true;
       this.cdr.detectChanges();
+      this.checkCompleteRedirect();
     });
 
     this.api.getUserProgress(this.userId).subscribe((progress: any[]) => {
       progress.forEach((p: any) => {
         this.progressMap[p.content_id] = p.status;
       });
+      this.progressLoaded = true;
       this.cdr.detectChanges();
+      this.checkCompleteRedirect();
+    });
+  }
+  
+  //completed state redirect
+  private checkCompleteRedirect() {
+    if (!this.contentLoaded || !this.progressLoaded) return;
+    if (this.isFinishedAll()) {
+      console.log('All content completed. Redirecting to complete page.');
+      this.router.navigate(['/complete', this.userId]);
+    }
+  }
+
+  isFinishedAll(): boolean {
+    if (!this.contentItems.length) return false;
+    return this.contentItems.every((item) => {
+      const status = this.progressMap[item.id];
+      return status === 'quiz_completed' || status === 'viewed';
     });
   }
 

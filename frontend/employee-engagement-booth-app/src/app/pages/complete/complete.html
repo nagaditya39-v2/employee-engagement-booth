@@ -1,0 +1,42 @@
+<div class="complete-page">
+  <div class="complete-card">
+    <p class="eyebrow">All done</p>
+    <h1>Nice work!</h1>
+    <p class="subtitle">You’ve finished all activities. Here’s your final score and summary.</p>
+
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span>⭐ Points</span>
+        <strong>{{ stats?.total_score ?? '—' }}</strong>
+      </div>
+      <div class="stat-item">
+        <span>🏆 Rank</span>
+        <strong>{{ stats ? ('#' + stats.rank) : '—' }}</strong>
+      </div>
+      <div class="stat-item">
+        <span>👥 Total users</span>
+        <strong>{{ stats?.total_users ?? '—' }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-list">
+      <h2>Activity summary</h2>
+      <div class="summary-row" *ngFor="let row of progressRows">
+        <div class="summary-main">
+          <h3>{{ row.item.title }}</h3>
+          <p>{{ row.item.content_type | titlecase }}</p>
+        </div>
+        <div class="summary-meta">
+          <span class="status">{{ row.progress.status === 'quiz_completed' ? 'Quiz complete' : row.progress.status === 'viewed' ? 'Viewed' : 'Not started' }}</span>
+          <span class="score" *ngIf="row.progress.score_till_now !== 0">
+            {{ row.progress.score_till_now }} pts
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" (click)="goBackToResume()">Return to resume</button>
+    </div>
+  </div>
+</div>
