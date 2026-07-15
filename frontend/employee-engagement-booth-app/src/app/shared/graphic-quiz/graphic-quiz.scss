@@ -355,3 +355,8 @@
 @media (max-width: 640px) {
   .match-grid { grid-template-columns: 1fr; }
 }
+
+.card-timer { margin-bottom: 0.8rem; }
+.timer-text { color: var(--text-dim); font-size: 0.9rem; }
+.timer-bar-track { height: 8px; background: rgba(255,255,255,0.04); border-radius: 8px; overflow: hidden; margin-top: 6px; }
+.timer-bar-fill { height: 100%; background: linear-gradient(90deg, var(--cobalt-bright), var(--cobalt)); transition: width 0.25s linear; }

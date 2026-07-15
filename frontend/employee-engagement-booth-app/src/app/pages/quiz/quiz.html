@@ -23,6 +23,16 @@
     <ng-container *ngIf="!result && currentQuestion">
       <p class="progress">Question {{ currentIndex + 1 }} of {{ questions.length }}</p>
 
+      <div class="question-timer">
+        <div class="timer-text">Time left: <strong>{{ timeLeft }}</strong>s</div>
+        <div class="timer-bar-track">
+          <div
+            class="timer-bar-fill"
+            [style.width.%]="(timeLeft / (timerSeconds || 1)) * 100"
+          ></div>
+        </div>
+      </div>
+
       <div class="progress-bar-track">
         <div class="progress-bar-fill" [style.width.%]="((currentIndex) / questions.length) * 100"></div>
       </div>

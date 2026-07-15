@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Api } from '../../services/api';
-import { API_BASE_URL } from '../../constants';
+import { API_BASE_URL, QUIZ_TIMER_SECONDS } from '../../constants';
 
 @Component({
   selector: 'app-quiz',
@@ -11,7 +11,7 @@ import { API_BASE_URL } from '../../constants';
   templateUrl: './quiz.html',
   styleUrl: './quiz.scss'
 })
-export class Quiz implements OnInit {
+export class Quiz implements OnInit, OnDestroy {
   userId: number = 0;
   contentId: number = 0;
   topicId: string | null = null;
@@ -24,6 +24,11 @@ export class Quiz implements OnInit {
   error: string = '';
 
   stats: { total_score: number; rank: number; total_users: number } | null = null;
+
+  // Timer fields
+  timerSeconds = QUIZ_TIMER_SECONDS;
+  timeLeft = 0;
+  private timerInterval: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,6 +44,10 @@ export class Quiz implements OnInit {
     this.loadStats();
   }
 
+  ngOnDestroy() {
+    this.stopTimer();
+  }
+
   loadStats() {
     this.api.getUserStats(this.userId).subscribe({
       next: (stats) => {
@@ -46,7 +55,6 @@ export class Quiz implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        // Non-fatal — the quiz still works without the stats bar.
         this.cdr.detectChanges();
       }
     });
@@ -56,10 +64,10 @@ export class Quiz implements OnInit {
     this.api.startQuiz(this.contentId, this.userId, this.topicId || undefined).subscribe({
       next: (questions: any[]) => {
         this.questions = questions;
-        // Resume at the first unanswered question, in case the window was reopened mid-quiz
         const firstUnanswered = questions.findIndex(q => !q.answered_at);
         this.currentIndex = firstUnanswered === -1 ? 0 : firstUnanswered;
         this.cdr.detectChanges();
+        this.startTimerForCurrentQuestion();
       },
       error: (err) => {
         this.error = err.error?.detail || 'Could not load quiz';
@@ -73,23 +81,30 @@ export class Quiz implements OnInit {
   }
 
   selectOption(option: string) {
-    if (this.currentQuestion.answered_at) return; // locked
+    if (this.currentQuestion?.answered_at) return;
     this.selectedOption = option;
   }
 
-  submitAnswer() {
-    if (!this.selectedOption || this.submitting) return;
+  // allow force submission on timeout
+  submitAnswer(force = false) {
+    if (!force && (!this.selectedOption || this.submitting)) return;
+    if (this.submitting) return;
     this.submitting = true;
 
-    this.api.submitAnswer(this.userId, this.currentQuestion.question_id, this.selectedOption).subscribe({
+    // choose an explicit value for forced timeout (empty string means "no answer")
+    const selected = this.selectedOption ?? '';
+
+    this.api.submitAnswer(this.userId, this.currentQuestion.question_id, selected).subscribe({
       next: (updated) => {
         this.questions[this.currentIndex] = updated;
         this.submitting = false;
         this.selectedOption = null;
+        this.stopTimer();
 
         if (this.currentIndex < this.questions.length - 1) {
           this.currentIndex++;
           this.cdr.detectChanges();
+          this.startTimerForCurrentQuestion();
         } else {
           this.finishQuiz();
         }
@@ -103,29 +118,21 @@ export class Quiz implements OnInit {
   }
 
   finishQuiz() {
+    this.stopTimer();
     this.api.submitQuiz(this.userId, this.contentId).subscribe({
       next: (result) => {
         this.result = result;
         this.cdr.detectChanges();
-
-        // Reflect the new score immediately in the stats bar, then refresh
-        // rank from the backend since other users' scores may have moved too.
         if (this.stats) {
           this.stats = { ...this.stats, total_score: result.total_score };
         }
         this.loadStats();
-
-        // Tell the kiosk (main) window the quiz is done — it owns the
-        // actual reset-to-login behavior, not this window.
         if (window.opener) {
           window.opener.postMessage(
             { type: 'quiz-complete', userId: this.userId, contentId: this.contentId, result },
             '*'
           );
         }
-
-        // After showing the score for a bit, this (second monitor) window
-        // reverts to the static welcome/display screen — NOT the login page.
         setTimeout(() => {
           window.location.href = `${API_BASE_URL}/test-display`;
         }, 4000);
@@ -133,8 +140,6 @@ export class Quiz implements OnInit {
       error: (err) => {
         this.error = err.error?.detail || 'Could not submit quiz';
         this.cdr.detectChanges();
-
-        // still notify kiosk and revert second screen
         if (window.opener) {
           window.opener.postMessage(
             { type: 'quiz-complete', userId: this.userId, contentId: this.contentId, result: { score_earned: 0 } },
@@ -144,7 +149,37 @@ export class Quiz implements OnInit {
         setTimeout(() => {
           window.location.href = `${API_BASE_URL}/test-display`;
         }, 4000);
-}
+      }
     });
+  }
+
+  // Timer helpers
+  private startTimerForCurrentQuestion() {
+    this.stopTimer();
+    // don't start if question is already answered
+    if (!this.currentQuestion || this.currentQuestion.answered_at) return;
+    this.timeLeft = this.timerSeconds;
+    this.timerInterval = window.setInterval(() => {
+      this.timeLeft--;
+      if (this.timeLeft <= 0) {
+        this.onTimerExpired();
+      } else {
+        this.cdr.detectChanges();
+      }
+    }, 1000) as unknown as number;
+    this.cdr.detectChanges();
+  }
+
+  private stopTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  private onTimerExpired() {
+    this.stopTimer();
+    // auto-submit even if no option selected (force=true)
+    this.submitAnswer(true);
   }
 }

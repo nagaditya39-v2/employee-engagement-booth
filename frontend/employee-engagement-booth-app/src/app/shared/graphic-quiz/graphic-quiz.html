@@ -29,6 +29,13 @@
       <div class="quiz-card" *ngIf="asMyth(currentQuestion) as q">
         <p class="progress">QUESTION {{ currentIndex + 1 }} OF {{ totalQuestions }}</p>
 
+        <div class="card-timer" *ngIf="timeLeft !== null">
+          <div class="timer-text">Time left: <strong>{{ timeLeft }}</strong>s</div>
+          <div class="timer-bar-track">
+            <div class="timer-bar-fill" [style.width.%]="(timeLeft / timerSeconds) * 100"></div>
+          </div>
+        </div>
+
         <div class="statement-card">
           <p>{{ q.statement }}</p>
         </div>
@@ -56,6 +63,13 @@
     <ng-container *ngIf="config.quizType === 'emoji' && !complete">
       <div class="quiz-card" *ngIf="asEmoji(currentQuestion) as q">
         <p class="progress">QUESTION {{ currentIndex + 1 }} OF {{ totalQuestions }}</p>
+
+        <div class="card-timer" *ngIf="timeLeft !== null">
+          <div class="timer-text">Time left: <strong>{{ timeLeft }}</strong>s</div>
+          <div class="timer-bar-track">
+            <div class="timer-bar-fill" [style.width.%]="(timeLeft / timerSeconds) * 100"></div>
+          </div>
+        </div>
 
         <div class="emoji-row">
           <ng-container *ngFor="let e of q.emojis; let last = last">
@@ -100,6 +114,13 @@
     <ng-container *ngIf="config.quizType === 'match' && !complete">
       <div class="quiz-card match-card" *ngIf="config.matchRound as round">
         <p class="prompt">Match the AI innovation on the left with the correct description on the right.</p>
+        
+        <div class="card-timer" *ngIf="timeLeft !== null">
+          <div class="timer-text">Time left: <strong>{{ timeLeft }}</strong>s</div>
+          <div class="timer-bar-track">
+            <div class="timer-bar-fill" [style.width.%]="(timeLeft / timerSeconds) * 100"></div>
+          </div>
+        </div>
 
         <div class="match-grid">
           <div class="match-col terms">

@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Api } from '../../services/api';
+import { QUIZ_TIMER_SECONDS } from '../../constants';
 
 interface MythQuestion {
   type: 'myth';
@@ -72,6 +73,10 @@ export class GraphicQuiz implements OnInit {
   stats: { total_score: number; rank: number; total_users: number } | null = null;
   complete = false;
 
+  timerSeconds = QUIZ_TIMER_SECONDS;
+  timeLeft = 0;
+  private timerInterval: number | null = null;
+
   private readonly matchColors = ['#4b9dff', '#c084fc', '#f97316', '#22c55e'];
 
   constructor(
@@ -105,6 +110,13 @@ export class GraphicQuiz implements OnInit {
           this.shuffledDescriptions = [...this.config.matchRound.pairs].sort(() => Math.random() - 0.5);
         }
         this.loading = false;
+        if (this.config?.questions && this.config.questions.length) {
+          // ensure currentIndex points to resume point if you want, then start timer
+          this.startTimerForCurrentQuestion();
+        } else if (this.config?.quizType === 'match') {
+          // start a single timer for the whole match round
+          this.startTimerForMatchRound();
+        }
         this.cdr.detectChanges();
       },
       error: () => {
@@ -138,6 +150,7 @@ export class GraphicQuiz implements OnInit {
     this.wasCorrect = choseMyth === q.isMyth;
     if (this.wasCorrect) this.score += 10;
     this.answered = true;
+    this.stopTimer();
     this.cdr.detectChanges();
   }
 
@@ -148,6 +161,7 @@ export class GraphicQuiz implements OnInit {
     this.wasCorrect = this.emojiInput.trim().toLowerCase() === q.answer.trim().toLowerCase();
     if (this.wasCorrect) this.score += 10;
     this.answered = true;
+    this.stopTimer();
     this.cdr.detectChanges();
   }
 
@@ -174,6 +188,7 @@ export class GraphicQuiz implements OnInit {
       this.wasCorrect = allCorrect;
       if (allCorrect) this.score += 10 * round.pairs.length;
       // Submit score and perform the same end-of-quiz flow as other quiz types
+      this.stopTimer();
       this.finish();
       return;
     }
@@ -206,6 +221,7 @@ export class GraphicQuiz implements OnInit {
       this.answered = false;
       this.emojiInput = '';
       this.showHint = false;
+      this.startTimerForCurrentQuestion();
       this.cdr.detectChanges();
     } else {
       this.finish();
@@ -226,7 +242,64 @@ export class GraphicQuiz implements OnInit {
         this.notifyKioskAndReset();
       },
     });
-}
+  }
+
+  // timer helpers:
+  private startTimerForCurrentQuestion() {
+    this.stopTimer();
+    // only for myth/emoji questions
+    if (!this.config?.questions || !this.config.questions.length) return;
+    const q = this.currentQuestion;
+    if (!q || (q as any).answered_at) return;
+    this.timeLeft = this.timerSeconds;
+    this.timerInterval = window.setInterval(() => {
+      this.timeLeft--;
+      if (this.timeLeft <= 0) {
+        this.onTimerExpiredForQuestion();
+      } else {
+        this.cdr.detectChanges();
+      }
+    }, 1000) as unknown as number;
+    this.cdr.detectChanges();
+  }
+
+  private startTimerForMatchRound() {
+    this.stopTimer();
+    this.timeLeft = this.timerSeconds;
+    this.timerInterval = window.setInterval(() => {
+      this.timeLeft--;
+      if (this.timeLeft <= 0) {
+        this.onTimerExpiredForMatch();
+      } else {
+        this.cdr.detectChanges();
+      }
+    }, 1000) as unknown as number;
+    this.cdr.detectChanges();
+  }
+
+  private stopTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  private onTimerExpiredForQuestion() {
+    this.stopTimer();
+    // treat as incorrect/no-answer and mark answered to reveal fact
+    this.answered = true;
+    this.wasCorrect = false;
+    this.cdr.detectChanges();
+    // optionally auto-move to next after a short delay:
+    setTimeout(() => this.next(), 1500);
+  }
+
+  private onTimerExpiredForMatch() {
+    this.stopTimer();
+    // end round as failed if not all matched
+    this.wasCorrect = false;
+    this.finish();
+  }
 
   private notifyKioskAndReset() {
     if (window.opener) {
