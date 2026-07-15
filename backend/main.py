@@ -543,6 +543,24 @@ async def submit_card_quiz(
         status=progress.status
     )
 
+@app.get("/users/{user_id}/stats", response_model=schemas.UserStatsOut)
+def get_user_stats(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Users).filter(models.Users.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    all_users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
+    rank = next((i + 1 for i, u in enumerate(all_users) if u.id == user_id), len(all_users))
+
+    return schemas.UserStatsOut(
+        user_id=user.id,
+        total_score=user.total_score or 0,
+        rank=rank,
+        total_users=len(all_users)
+    )
+
+
+# ---------catch-all here at the bottom 
 
 static_dir = os.path.join(os.path.dirname(__file__), "../frontend/employee-engagement-booth-app/dist/employee-engagement-booth-app/browser")
 
@@ -562,19 +580,3 @@ def serve_spa(full_path: str):
     if "." in os.path.basename(full_path):
         raise HTTPException(status_code=404, detail=f"Static asset not found: {full_path}")
     return FileResponse(index_path)
-
-@app.get("/users/{user_id}/stats", response_model=schemas.UserStatsOut)
-def get_user_stats(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(models.Users).filter(models.Users.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    all_users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
-    rank = next((i + 1 for i, u in enumerate(all_users) if u.id == user_id), len(all_users))
-
-    return schemas.UserStatsOut(
-        user_id=user.id,
-        total_score=user.total_score or 0,
-        rank=rank,
-        total_users=len(all_users)
-    )
