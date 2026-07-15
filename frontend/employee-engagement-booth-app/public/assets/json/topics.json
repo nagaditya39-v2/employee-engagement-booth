@@ -2,31 +2,54 @@
   {
     "id": "ai-basics",
     "title": "What Is Generative AI?",
-    "videoId": "Y8Tjs7RkqWo",
-    "description": "A quick primer on how generative AI models learn and create content."
+    "videoFile": "",
+    "description": "A quick primer on how generative AI models learn and create content.",
+    "comingSoon": true
   },
   {
     "id": "cybersecurity",
-    "title": "Cybersecurity Basics",
-    "videoId": "fB7GxF7jA_4",
-    "description": "The everyday habits that keep company data and accounts safe."
+    "title": "Cybersecurity Briefing: Rapid Dive",
+    "videoFile": "cybersecurity.mp4",
+    "description": "The CIA triad, vulnerabilities vs. threats, DOS attacks, and everyday digital hygiene."
   },
   {
     "id": "sustainability",
     "title": "Sustainability at Work",
-    "videoId": "d7Dm5EoMCEw",
-    "description": "Small daily choices that add up to a big environmental impact."
+    "videoFile": "",
+    "description": "Small daily choices that add up to a big environmental impact.",
+    "comingSoon": true
   },
   {
     "id": "innovation",
     "title": "Innovation Mindset",
-    "videoId": "gkZJ6x6kloY",
-    "description": "How great ideas move from a napkin sketch to reality."
+    "videoFile": "",
+    "description": "How great ideas move from a napkin sketch to reality.",
+    "comingSoon": true
   },
   {
     "id": "teamwork",
     "title": "The Power of Teamwork",
-    "videoId": "uFO7vOi2mKU",
-    "description": "Why diverse teams solve problems faster and better."
+    "videoFile": "",
+    "description": "Why diverse teams solve problems faster and better.",
+    "comingSoon": true
+  },
+  {
+    "id": "rag",
+    "title": "Retrieval-Augmented Generation (RAG)",
+    "videoFile": "rag.mp4",
+    "description": "How RAG combines large language models with external knowledge sources to reduce hallucinations."
+  },
+  {
+    "id": "proxy-servers",
+    "title": "How Proxy Servers Work",
+    "videoFile": "proxy-servers.mp4",
+    "description": "Forward vs. reverse proxies, caching, and inspecting traffic in transit."
+  },
+  {
+    "id": "coming-soon-1",
+    "title": "Coming Soon",
+    "videoFile": "",
+    "description": "A new topic is on the way — check back soon.",
+    "comingSoon": true
   }
 ]

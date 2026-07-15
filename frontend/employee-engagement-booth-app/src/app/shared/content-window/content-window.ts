@@ -2,13 +2,13 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Api } from '../../services/api';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 interface Topic {
   id: string;
   title: string;
-  videoId: string;
   description: string;
+  videoFile: string;
+  comingSoon?: boolean;
 }
 
 @Component({
@@ -24,23 +24,13 @@ export class ContentWindow {
 
   topics: Topic[] = [];
   loadingTopics = true;
-
-  // True while we're checking the backend for an existing topic lock —
-  // guards against briefly flashing the pick-a-topic grid before we know
-  // whether this user already chose one (possibly on a different kiosk).
   checkingProgress = true;
 
-  // Topic the user is currently previewing (not locked in yet)
   previewTopicId: string | null = null;
 
-  // Topic locked in — once set, this is the only content the user can see.
-  // Can be set either by confirmSelection() (fresh pick) or by
-  // resolveLockedTopicFromBackend() (returning to an already-locked session).
   lockedTopic: Topic | null = null;
-  safeVideoUrl: SafeResourceUrl | null = null;
+  localVideoUrl: string | null = null;
 
-  // True if the backend says this user already finished the quiz for this
-  // topic — in that case we don't offer "take the quiz" again.
   alreadyCompleted = false;
 
   constructor(
@@ -48,7 +38,6 @@ export class ContentWindow {
     private router: Router,
     private api: Api,
     private cdr: ChangeDetectorRef,
-    private sanitizer: DomSanitizer,
   ) { }
 
   ngOnInit() {
@@ -68,17 +57,10 @@ export class ContentWindow {
     });
   }
 
-  // Looks up this user's Progress row for this content item. If they've
-  // already moved past "picking a topic" (quiz_assigned or quiz_completed),
-  // we must not show the topic grid again — a topic choice, once locked, is
-  // final, matching the same "no reroll" rule the quiz itself already
-  // enforces. Resolves which topic via the already-assigned questions'
-  // topic_key, since that's stored server-side and works from any kiosk.
   private checkExistingLock() {
     this.api.getUserProgress(this.userId).subscribe({
       next: (progressList: any[]) => {
         const progress = progressList.find((p) => p.content_id === this.contentId);
-
         if (progress && (progress.status === 'quiz_assigned' || progress.status === 'quiz_completed')) {
           this.resolveLockedTopicFromBackend(progress.status);
         } else {
@@ -93,21 +75,13 @@ export class ContentWindow {
     });
   }
 
-  // Safe to call here specifically because attempts are already guaranteed
-  // to exist (status check above) — start-quiz is idempotent and will
-  // return the existing assigned questions rather than drawing a fresh,
-  // untagged batch. Calling this BEFORE a topic is picked would be unsafe.
   private resolveLockedTopicFromBackend(status: string) {
     this.api.startQuiz(this.contentId, this.userId).subscribe({
       next: (assigned: any[]) => {
         const topicKey = assigned?.[0]?.topic_key;
         const topic = this.topics.find((t) => t.id === topicKey) ?? null;
-
         if (topic) {
-          this.lockedTopic = topic;
-          this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-            `https://www.youtube-nocookie.com/embed/${topic.videoId}?rel=0&modestbranding=1`
-          );
+          this.lockTopic(topic);
         }
         this.alreadyCompleted = status === 'quiz_completed';
         this.checkingProgress = false;
@@ -121,10 +95,12 @@ export class ContentWindow {
   }
 
   thumbnailUrl(topic: Topic): string {
-    return `https://img.youtube.com/vi/${topic.videoId}/hqdefault.jpg`;
+    // will add actuals late, mayb in public/assets/thumbs
+    return 'assets/img/turbine-fan-icon.png';
   }
 
   previewTopic(topic: Topic): void {
+    if (topic.comingSoon) return;
     this.previewTopicId = topic.id;
   }
 
@@ -132,36 +108,27 @@ export class ContentWindow {
     return this.previewTopicId === topic.id;
   }
 
-  // Locks the choice in — after this, the user can only see this one topic.
   confirmSelection(): void {
     const topic = this.topics.find(t => t.id === this.previewTopicId);
-    if (!topic) return;
-
-    this.lockedTopic = topic;
-    this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-      `https://www.youtube-nocookie.com/embed/${topic.videoId}?rel=0&modestbranding=1`
-    );
+    if (!topic || topic.comingSoon) return;
+    this.lockTopic(topic);
     this.cdr.detectChanges();
   }
 
-  backButton() {
-    // Tell the menu (opener) window to go back to the resume/idle screen.
-    if (window.opener) {
-      window.opener.postMessage(
-        { type: 'BACK_TO_RESUME' },
-        window.location.origin
-      );
-    }
+  private lockTopic(topic: Topic) {
+    this.lockedTopic = topic;
+    this.localVideoUrl = `assets/videos/${topic.videoFile}`;
+  }
 
-    // This IS the second-monitor window — revert itself to the static
-    // idle display, same pattern as quiz.ts's finishQuiz().
+  backButton() {
+    if (window.opener) {
+      window.opener.postMessage({ type: 'BACK_TO_RESUME' }, window.location.origin);
+    }
     window.location.href = this.api.getTestContentUrl();
   }
 
-  // Exit the content view and go attempt the quiz for the topic just picked.
   goToQuiz(): void {
     if (!this.lockedTopic) return;
-
     this.router.navigate(['/quiz', this.userId, this.contentId], {
       queryParams: { topic: this.lockedTopic.id }
     });

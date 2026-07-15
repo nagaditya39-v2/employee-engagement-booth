@@ -18,6 +18,7 @@
         class="topic-card"
         *ngFor="let topic of topics"
         [class.previewed]="isPreviewed(topic)"
+        [class.coming-soon]="topic.comingSoon"
         (click)="previewTopic(topic)"
       >
         <img class="topic-thumb" [src]="thumbnailUrl(topic)" alt="" />
@@ -26,6 +27,7 @@
           <p>{{ topic.description }}</p>
         </div>
         <div class="topic-check" *ngIf="isPreviewed(topic)">✓ Selected</div>
+        <div class="topic-check" *ngIf="topic.comingSoon">🔒 Coming Soon</div>
       </div>
     </div>
 
@@ -49,13 +51,11 @@
 
     <div class="video-card">
       <div class="video-frame">
-        <iframe
-          [src]="safeVideoUrl"
-          title="{{ lockedTopic.title }}"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-        ></iframe>
+        <video
+          [src]="localVideoUrl"
+          controls
+          playsinline
+        ></video>
       </div>
     </div>
 

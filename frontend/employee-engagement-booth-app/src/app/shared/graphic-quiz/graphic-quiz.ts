@@ -236,6 +236,13 @@ export class GraphicQuiz implements OnInit {
     return q as EmojiQuestion;
   }
 
+  normalizeAnswer(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '');
+}
+
   // ---- Myth / Real ----
   answerMyth(choseMyth: boolean) {
     if (this.answered) return;
@@ -251,7 +258,9 @@ export class GraphicQuiz implements OnInit {
   submitEmojiAnswer() {
     if (this.answered || !this.emojiInput.trim()) return;
     const q = this.asEmoji(this.currentQuestion);
-    this.wasCorrect = this.emojiInput.trim().toLowerCase() === q.answer.trim().toLowerCase();
+    const normalizedEntry = this.normalizeAnswer(this.emojiInput);
+    const normalizedAnswer = this.normalizeAnswer(q.answer);
+    this.wasCorrect = normalizedEntry === normalizedAnswer;
     if (this.wasCorrect) this.score += 10;
     this.answered = true;
     this.stopTimer();
