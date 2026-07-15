@@ -112,9 +112,12 @@
 
     <!-- ================= MATCH THE TECH ================= -->
     <ng-container *ngIf="config.quizType === 'match' && !complete">
-      <div class="quiz-card match-card" *ngIf="config.matchRound as round">
-        <p class="prompt">Match the AI innovation on the left with the correct description on the right.</p>
-        
+      <div class="quiz-card match-card" *ngIf="currentRound as round">
+        <p class="prompt">
+          Match the item on the left with the correct description on the right.
+          <span *ngIf="round.roundTitle"> — {{ round.roundTitle }}</span>
+        </p>
+
         <div class="card-timer" *ngIf="timeLeft !== null">
           <div class="timer-text">Time left: <strong>{{ timeLeft }}</strong>s</div>
           <div class="timer-bar-track">
@@ -133,7 +136,6 @@
               (click)="selectTerm(p.id)"
             >
               <span class="term-index">{{ i + 1 }}</span>
-              <!-- <img [src]="p.imageUrl" alt="" (error)="onImageError($event)" /> -->
               <span class="term-label">{{ p.term }}</span>
             </div>
           </div>

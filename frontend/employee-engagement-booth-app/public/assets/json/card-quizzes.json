@@ -3,69 +3,157 @@
     "contentId": 2,
     "quizType": "myth",
     "title": "AI MYTHBUSTERS",
-    "subtitle": "Identify whether the statement is Real or Myth",
+    "subtitle": "Real or Myth? Test your AI knowledge.",
     "accent": "accent-blue",
     "questions": [
-      {
-        "type": "myth",
-        "statement": "AI will replace all engineers in the next 5 years.",
-        "isMyth": true,
-        "funFact": "Myth! AI is a tool that augments engineers. It helps automate tasks, but human creativity, problem-solving, and decision-making remain irreplaceable."
-      },
-      {
-        "type": "myth",
-        "statement": "Generative AI models can produce inaccurate or fabricated information.",
-        "isMyth": false,
-        "funFact": "Real! This is known as 'hallucination' — always review and verify AI-generated content before using it for official work."
-      },
-      {
-        "type": "myth",
-        "statement": "AI models learn by memorizing every input verbatim, like a filing cabinet.",
-        "isMyth": true,
-        "funFact": "Myth! Models learn statistical patterns across huge datasets rather than storing exact copies of what they were trained on."
-      }
+      { "type": "myth", "statement": "AI works using artificial neural networks inspired by the way our brain connects information.", "isMyth": false, "funFact": "Neural networks are inspired by biological neurons. They use layers of connected nodes to identify patterns, similar to how our brain processes information — but they do not think or feel like humans." },
+      { "type": "myth", "statement": "AI learns by itself like a human child learning from experience.", "isMyth": true, "funFact": "AI learns through mathematical algorithms and large amounts of data provided during training. It does not have curiosity, emotions, or understanding like humans." },
+      { "type": "myth", "statement": "The more high-quality data an AI model learns from, the better it can become.", "isMyth": false, "funFact": "AI models improve by finding patterns in large datasets. Better quality data usually helps AI produce better results." },
+      { "type": "myth", "statement": "ChatGPT does not \"search the internet\"; it predicts the most likely next words based on patterns it learned.", "isMyth": false, "funFact": "Large Language Models (LLMs) generate responses by predicting sequences of words based on patterns learned during training." },
+      { "type": "myth", "statement": "AI has a brain like humans and can form its own opinions.", "isMyth": true, "funFact": "AI does not have consciousness, beliefs, emotions, or personal opinions. It generates responses based on patterns in data." },
+      { "type": "myth", "statement": "AI can predict the future perfectly.", "isMyth": true, "funFact": "AI predicts possibilities using patterns and probabilities. It can make useful forecasts, but unexpected events can still happen." },
+      { "type": "myth", "statement": "Voice assistants understand words the same way humans understand conversations.", "isMyth": true, "funFact": "AI recognizes patterns in speech and language. It does not truly understand meaning, emotions, or context the same way humans do." },
+      { "type": "myth", "statement": "AI can accidentally become biased and make unfair decisions.", "isMyth": false, "funFact": "AI learns from data. If the training data contains bias, the AI system may learn and reproduce those biases." },
+      { "type": "myth", "statement": "AI remembers every conversation it has ever had with every user.", "isMyth": true, "funFact": "AI systems do not automatically remember every interaction forever. Memory depends on how the AI system is designed and configured." },
+      { "type": "myth", "statement": "AI is a new invention that started only after ChatGPT launched.", "isMyth": true, "funFact": "AI research has existed since the 1950s. ChatGPT is one of the recent breakthroughs that made AI popular among everyday users." },
+      { "type": "myth", "statement": "Bananas are commonly used to train AI models because they are easy for AI to recognize.", "isMyth": true, "funFact": "Bananas are sometimes used in AI demonstrations because they are simple objects to recognize, but they are not special AI training material." },
+      { "type": "myth", "statement": "Hugging Face is a popular platform where people share AI models and tools.", "isMyth": false, "funFact": "Hugging Face is a major open-source AI community where researchers and developers share machine learning models, datasets, and AI tools." },
+      { "type": "myth", "statement": "Gemini's logo means magic.", "isMyth": true, "funFact": "Google Gemini's logo uses a sparkling, abstract design to represent intelligence, creativity, and the idea of AI helping humans discover and create new things. The name \"Gemini\" refers to two connected concepts working together." },
+      { "type": "myth", "statement": "Nano Banana is a new type of AI-powered banana used to train AI models.", "isMyth": true, "funFact": "Nano Banana is actually a nickname used online for an AI image generation/editing model, not a real fruit or AI training material. It became popular because of its unusual name." },
+      { "type": "myth", "statement": "Hugging Face is a social media app where AI researchers share selfies.", "isMyth": true, "funFact": "Hugging Face is an AI platform and open-source community where developers share AI models, datasets, and machine learning tools." },
+      { "type": "myth", "statement": "Microsoft Copilot is called \"Copilot\" because AI is designed to assist humans, not replace them.", "isMyth": false, "funFact": "A copilot helps a pilot fly an aircraft by assisting with navigation and decisions. Similarly, AI copilots are designed to support humans in tasks like writing, coding, and analysis." },
+      { "type": "myth", "statement": "Large Language Models (LLMs) understand language exactly like humans do.", "isMyth": true, "funFact": "LLMs are extremely good at recognizing language patterns and generating responses, but they do not truly understand concepts, emotions, or experiences like humans." },
+      { "type": "myth", "statement": "Generative AI can create completely new content even though it learned from existing examples.", "isMyth": false, "funFact": "Generative AI learns patterns from existing data and uses those patterns to create new text, images, music, videos, and code." },
+      { "type": "myth", "statement": "AI models have billions of \"parameters\" that help them make decisions.", "isMyth": false, "funFact": "Parameters are values learned during training that help AI recognize patterns and generate outputs. Large models can contain billions or even trillions of parameters." },
+      { "type": "myth", "statement": "Prompt engineering means teaching an AI model how to think like a human.", "isMyth": true, "funFact": "Prompt engineering means creating better instructions or questions to guide AI tools. It does not change the AI's actual thinking process." },
+      { "type": "myth", "statement": "AI uses more electricity than the entire internet.", "isMyth": true, "funFact": "AI systems do require significant computing power, especially during training, but the relationship between AI energy use and global internet energy use is more complex." },
+      { "type": "myth", "statement": "The first AI chatbot was created before the first mobile phone became popular.", "isMyth": false, "funFact": "ELIZA, one of the earliest chatbots, was created in 1966 — decades before modern smartphones and today's AI assistants." },
+      { "type": "myth", "statement": "AI was first tested by teaching computers to recognize cats.", "isMyth": false, "funFact": "A famous Google research experiment in 2012 used neural networks to identify cats from millions of images." },
+      { "type": "myth", "statement": "AI-generated artwork has won competitions against human artists.", "isMyth": false, "funFact": "AI-generated art has competed and won recognition in creative competitions." },
+      { "type": "myth", "statement": "The word \"robot\" existed before AI was invented.", "isMyth": false, "funFact": "The word robot came from a 1920 Czech play, while modern AI research began later." },
+      { "type": "myth", "statement": "AI can help scientists discover new medicines faster.", "isMyth": false, "funFact": "AI can analyze molecules and predict potential drug candidates." }
     ]
   },
   {
     "contentId": 3,
     "quizType": "emoji",
     "title": "EMOJI PUZZLE",
-    "subtitle": "Decode the emojis and type the correct answer",
+    "subtitle": "Decode the emoji clues into tech terms.",
     "accent": "accent-orange",
     "questions": [
-      {
-        "type": "emoji",
-        "emojis": ["🤖", "🧠", "⚙️"],
-        "answer": "machine learning",
-        "hint": "It's a technology that enables machines to think and learn like humans."
-      },
-      {
-        "type": "emoji",
-        "emojis": ["🔒", "💻", "🛡️"],
-        "answer": "cybersecurity",
-        "hint": "Keeping data and accounts safe from bad actors."
-      },
-      {
-        "type": "emoji",
-        "emojis": ["☁️", "📊", "🔗"],
-        "answer": "cloud computing",
-        "hint": "Storing and processing data somewhere other than your own laptop."
-      }
+      { "type": "emoji", "emojis": ["🤖", "🧠"], "hint": "Teaching computers to learn from data.", "answer": "Machine Learning" },
+      { "type": "emoji", "emojis": ["🧠", "✨"], "hint": "The technology powering today's smart apps.", "answer": "Artificial Intelligence" },
+      { "type": "emoji", "emojis": ["💬", "🤖"], "hint": "You might chat with one on a company's website.", "answer": "Chatbot" },
+      { "type": "emoji", "emojis": ["👁️", "🤖"], "hint": "When computers can \"see\" and understand images.", "answer": "Computer Vision" },
+      { "type": "emoji", "emojis": ["🎤", "➡️", "📝"], "hint": "Turns your voice into written words.", "answer": "Speech to Text" },
+      { "type": "emoji", "emojis": ["📝", "➡️", "🎤"], "hint": "Makes written words sound like human speech.", "answer": "Text to Speech" },
+      { "type": "emoji", "emojis": ["🌩️", "💻"], "hint": "Your files and apps live \"somewhere on the internet.\"", "answer": "Cloud Computing" },
+      { "type": "emoji", "emojis": ["🔒", "☁️"], "hint": "Protecting data stored online.", "answer": "Cloud Security" },
+      { "type": "emoji", "emojis": ["📊", "🧠"], "hint": "Finding insights hidden inside data.", "answer": "Data Science" },
+      { "type": "emoji", "emojis": ["📚", "🤖"], "hint": "The type of AI behind ChatGPT and similar tools.", "answer": "Large Language Model" },
+      { "type": "emoji", "emojis": ["🔍", "🍌"], "hint": "A fun AI model with a fruity name.", "answer": "Nano Banana" },
+      { "type": "emoji", "emojis": ["🇳", "📹", "@"], "hint": "A famous AI chip company hidden in emojis.", "answer": "NVIDIA" },
+      { "type": "emoji", "emojis": ["🟢", "🤖"], "hint": "Google's AI assistant and model family.", "answer": "Gemini" },
+      { "type": "emoji", "emojis": ["🖼️", "✨"], "hint": "AI creates pictures from your imagination.", "answer": "Image Generation" },
+      { "type": "emoji", "emojis": ["🏠", "🤖"], "hint": "A home that responds intelligently to you.", "answer": "Smart Home" },
+      { "type": "emoji", "emojis": ["⌚", "❤️"], "hint": "A wearable gadget that tracks more than time.", "answer": "Smart Watch" },
+      { "type": "emoji", "emojis": ["🚗", "🤖"], "hint": "A car that can drive itself.", "answer": "Self-Driving Car" },
+      { "type": "emoji", "emojis": ["🦙"], "hint": "Meta's open AI model shares its name with this animal.", "answer": "Llama" },
+      { "type": "emoji", "emojis": ["🎬", "✨"], "hint": "OpenAI's model that creates realistic videos.", "answer": "Sora" },
+      { "type": "emoji", "emojis": ["🛡️", "💻"], "hint": "Protecting computers from hackers and attacks.", "answer": "Cybersecurity" },
+      { "type": "emoji", "emojis": ["🦠", "💻"], "hint": "Not the biological kind—but it spreads too!", "answer": "Computer Virus" },
+      { "type": "emoji", "emojis": ["📦", "😊"], "hint": "The online shopping giant started with books.", "answer": "Amazon" },
+      { "type": "emoji", "emojis": ["🚘", "⚡"], "hint": "An electric car company led by Elon Musk.", "answer": "Tesla" },
+      { "type": "emoji", "emojis": ["🚀", "❌"], "hint": "Elon Musk's company exploring beyond Earth.", "answer": "SpaceX" },
+      { "type": "emoji", "emojis": ["🐧", "💻"], "hint": "An operating system represented by a penguin.", "answer": "Linux" },
+      { "type": "emoji", "emojis": ["📱", "🤖"], "hint": "Siri, Alexa, and Google Assistant belong here.", "answer": "Virtual Assistant" },
+      { "type": "emoji", "emojis": ["🤖", "🛍️"], "hint": "\"You may also like…\" powered by AI.", "answer": "AI Recommendations" },
+      { "type": "emoji", "emojis": ["🧠", "📊"], "hint": "AI forecasting what might happen next.", "answer": "Predictive Analytics" },
+      { "type": "emoji", "emojis": ["🤖", "🚗"], "hint": "The broader term for vehicles that drive on their own.", "answer": "Autonomous Vehicle" }
     ]
   },
   {
     "contentId": 4,
     "quizType": "match",
     "title": "MATCH THE TECH",
-    "subtitle": "Match the AI innovation with the correct description",
+    "subtitle": "Match each item on the left with its correct pair on the right.",
     "accent": "accent-green",
-    "matchRound": {
-      "pairs": [
-        { "id": "A", "term": "Robotic Process Automation (RPA)", "imageUrl": "assets/img/match/rpa.jpg", "description": "Automates repetitive business tasks using software bots" },
-        { "id": "B", "term": "Digital Twin", "imageUrl": "assets/img/match/digital-twin.jpg", "description": "A virtual replica of a physical asset or process" },
-        { "id": "C", "term": "Voice Assistant", "imageUrl": "assets/img/match/voice-assistant.jpg", "description": "Understands and responds to voice commands" },
-        { "id": "D", "term": "Machine Learning", "imageUrl": "assets/img/match/machine-learning.jpg", "description": "Learns from data and makes predictions without being explicitly programmed" }
-      ]
-    }
+    "matchRounds": [
+      {
+        "roundTitle": "AI Models & Companies",
+        "pairs": [
+          { "id": "1", "term": "ChatGPT", "imageUrl": "", "description": "OpenAI" },
+          { "id": "2", "term": "Gemini", "imageUrl": "", "description": "Google" },
+          { "id": "3", "term": "Claude", "imageUrl": "", "description": "Anthropic" },
+          { "id": "4", "term": "Grok", "imageUrl": "", "description": "xAI" },
+          { "id": "5", "term": "Llama", "imageUrl": "", "description": "Meta" },
+          { "id": "6", "term": "Sora", "imageUrl": "", "description": "OpenAI" },
+          { "id": "7", "term": "Whisper", "imageUrl": "", "description": "OpenAI" },
+          { "id": "8", "term": "Midjourney", "imageUrl": "", "description": "Midjourney Inc." },
+          { "id": "9", "term": "Stable Diffusion", "imageUrl": "", "description": "Stability AI" },
+          { "id": "10", "term": "AlphaFold", "imageUrl": "", "description": "Google DeepMind" }
+        ]
+      },
+      {
+        "roundTitle": "Digital Innovations Around the World",
+        "pairs": [
+          { "id": "1", "term": "UPI", "imageUrl": "", "description": "India" },
+          { "id": "2", "term": "E-Residency", "imageUrl": "", "description": "Estonia" },
+          { "id": "3", "term": "Digital Yuan", "imageUrl": "", "description": "China" },
+          { "id": "4", "term": "Arab Mars Mission", "imageUrl": "", "description": "UAE" },
+          { "id": "5", "term": "Aadhaar", "imageUrl": "", "description": "India" },
+          { "id": "6", "term": "Starlink", "imageUrl": "", "description": "SpaceX" },
+          { "id": "7", "term": "Waymo Robotaxi", "imageUrl": "", "description": "Waymo/Alphabet" },
+          { "id": "8", "term": "Amazon Go", "imageUrl": "", "description": "Amazon" },
+          { "id": "9", "term": "Nationwide 5G leadership", "imageUrl": "", "description": "South Korea" },
+          { "id": "10", "term": "e-Krona Pilot", "imageUrl": "", "description": "Sweden" }
+        ]
+      },
+      {
+        "roundTitle": "Inventors & Creators",
+        "pairs": [
+          { "id": "1", "term": "World Wide Web", "imageUrl": "", "description": "Tim Berners-Lee" },
+          { "id": "2", "term": "Linux", "imageUrl": "", "description": "Linus Torvalds" },
+          { "id": "3", "term": "Python", "imageUrl": "", "description": "Guido van Rossum" },
+          { "id": "4", "term": "Java", "imageUrl": "", "description": "James Gosling" },
+          { "id": "5", "term": "C Programming Language", "imageUrl": "", "description": "Dennis Ritchie" },
+          { "id": "6", "term": "Bluetooth", "imageUrl": "", "description": "Ericsson" },
+          { "id": "7", "term": "Git", "imageUrl": "", "description": "Linus Torvalds" },
+          { "id": "8", "term": "HTML", "imageUrl": "", "description": "Tim Berners-Lee" },
+          { "id": "9", "term": "QR Code", "imageUrl": "", "description": "Masahiro Hara" },
+          { "id": "10", "term": "JavaScript", "imageUrl": "", "description": "Brendan Eich" }
+        ]
+      },
+      {
+        "roundTitle": "Emerging Tech & Cybersecurity",
+        "pairs": [
+          { "id": "1", "term": "Digital Twin", "imageUrl": "", "description": "Virtual copy of physical asset" },
+          { "id": "2", "term": "Edge Computing", "imageUrl": "", "description": "Processing near source" },
+          { "id": "3", "term": "Generative AI", "imageUrl": "", "description": "AI creates content" },
+          { "id": "4", "term": "Quantum Computing", "imageUrl": "", "description": "Uses qubits" },
+          { "id": "5", "term": "Blockchain", "imageUrl": "", "description": "Distributed ledger" },
+          { "id": "6", "term": "Phishing", "imageUrl": "", "description": "Credential theft attack" },
+          { "id": "7", "term": "Ransomware", "imageUrl": "", "description": "Encrypts files for ransom" },
+          { "id": "8", "term": "MFA", "imageUrl": "", "description": "Multi-Factor Authentication" },
+          { "id": "9", "term": "Zero Trust", "imageUrl": "", "description": "Never trust, always verify" },
+          { "id": "10", "term": "DDoS", "imageUrl": "", "description": "Distributed Denial of Service" }
+        ]
+      },
+      {
+        "roundTitle": "Companies & Products",
+        "pairs": [
+          { "id": "1", "term": "NVIDIA", "imageUrl": "", "description": "CUDA" },
+          { "id": "2", "term": "Adobe", "imageUrl": "", "description": "Photoshop" },
+          { "id": "3", "term": "Apple", "imageUrl": "", "description": "iPhone" },
+          { "id": "4", "term": "Tesla", "imageUrl": "", "description": "Autopilot" },
+          { "id": "5", "term": "Microsoft", "imageUrl": "", "description": "Copilot" },
+          { "id": "6", "term": "Google", "imageUrl": "", "description": "Android" },
+          { "id": "7", "term": "GitHub", "imageUrl": "", "description": "GitHub Copilot" },
+          { "id": "8", "term": "OpenAI", "imageUrl": "", "description": "ChatGPT" },
+          { "id": "9", "term": "Meta", "imageUrl": "", "description": "Llama" },
+          { "id": "10", "term": "SpaceX", "imageUrl": "", "description": "Starlink" }
+        ]
+      }
+    ]
   }
 ]

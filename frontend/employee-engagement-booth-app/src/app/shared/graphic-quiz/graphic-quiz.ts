@@ -27,6 +27,7 @@ interface MatchPair {
 }
 
 interface MatchRound {
+  roundTitle?: string;
   pairs: MatchPair[];
 }
 
@@ -39,8 +40,52 @@ interface CardQuizConfig {
   subtitle: string;
   accent: string;
   questions?: Question[];
+  // Legacy: a single match round.
   matchRound?: MatchRound;
+  // Multiple categories to draw a locked round from (applies to quizType 'match').
+  matchRounds?: MatchRound[];
 }
+
+// How many questions/pairs a locked draw contains for any card-quiz type.
+const CARD_QUIZ_DRAW_COUNT = 5;
+
+// ---- Deterministic seeded RNG helpers ----------------------------------
+// Same (userId, contentId, quizType) always produces the same seed, so the
+// same user always gets the same drawn questions in the same order — this
+// IS the "lock" mechanism for cards 2-4, without needing any backend state.
+// Mirrors the "no reroll once assigned" rule used for card 1's MCQ pool,
+// just implemented as a pure function of identity instead of a DB row.
+
+function hashSeed(str: string): number {
+  let h = 2166136261 >>> 0; // FNV-1a offset basis
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function mulberry32(seed: number): () => number {
+  let state = seed >>> 0;
+  return function () {
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Fisher-Yates shuffle driven by a supplied RNG function, so multiple draws
+// from the same seeded generator stay consistent with each other in one pass.
+function seededShuffle<T>(rand: () => number, arr: T[]): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+// -------------------------------------------------------------------------
 
 @Component({
   selector: 'app-graphic-quiz',
@@ -55,6 +100,14 @@ export class GraphicQuiz implements OnInit {
 
   config: CardQuizConfig | null = null;
   loading = true;
+
+  // The locked, drawn subset actually played this session — for myth/emoji
+  // this is CARD_QUIZ_DRAW_COUNT questions out of the full pool.
+  activeQuestions: Question[] = [];
+
+  // The locked, drawn round + subset of pairs actually played this session
+  // (for quizType 'match').
+  activeMatchRound: MatchRound | null = null;
 
   currentIndex = 0;
   score = 0;
@@ -106,15 +159,16 @@ export class GraphicQuiz implements OnInit {
     this.api.getCardQuizzes().subscribe({
       next: (all: CardQuizConfig[]) => {
         this.config = all.find((c) => c.contentId === this.contentId) ?? null;
-        if (this.config?.quizType === 'match' && this.config.matchRound) {
-          this.shuffledDescriptions = [...this.config.matchRound.pairs].sort(() => Math.random() - 0.5);
+
+        if (this.config) {
+          this.prepareLockedDraw();
         }
+
         this.loading = false;
-        if (this.config?.questions && this.config.questions.length) {
-          // ensure currentIndex points to resume point if you want, then start timer
+
+        if (this.config?.quizType === 'myth' || this.config?.quizType === 'emoji') {
           this.startTimerForCurrentQuestion();
-        } else if (this.config?.quizType === 'match') {
-          // start a single timer for the whole match round
+        } else if (this.config?.quizType === 'match' && this.activeMatchRound) {
           this.startTimerForMatchRound();
         }
         this.cdr.detectChanges();
@@ -126,13 +180,52 @@ export class GraphicQuiz implements OnInit {
     });
   }
 
+  // Draws (and locks) this user's fixed subset of questions/pairs for this
+  // card. Same userId + contentId + quizType => same seed => same draw,
+  // every time they open this card, on any kiosk.
+  private prepareLockedDraw() {
+    if (!this.config) return;
+    const seed = hashSeed(`${this.userId}-${this.contentId}-${this.config.quizType}`);
+    const rand = mulberry32(seed);
+
+    if (this.config.quizType === 'myth' || this.config.quizType === 'emoji') {
+      const pool = this.config.questions ?? [];
+      const drawCount = Math.min(CARD_QUIZ_DRAW_COUNT, pool.length);
+      this.activeQuestions = seededShuffle(rand, pool).slice(0, drawCount);
+    } else if (this.config.quizType === 'match') {
+      const rounds = this.config.matchRounds ?? (this.config.matchRound ? [this.config.matchRound] : []);
+      if (rounds.length) {
+        // Lock which category/round this user gets...
+        const roundIndex = Math.floor(rand() * rounds.length);
+        const chosenRound = rounds[roundIndex];
+        // ...then lock which 5 pairs from that round, using continued draws
+        // from the same generator so the whole session is one deterministic sequence.
+        const drawCount = Math.min(CARD_QUIZ_DRAW_COUNT, chosenRound.pairs.length);
+        const pairs = seededShuffle(rand, chosenRound.pairs).slice(0, drawCount);
+        this.activeMatchRound = { roundTitle: chosenRound.roundTitle, pairs };
+        this.setupMatchRoundState(rand);
+      }
+    }
+  }
+
+  private setupMatchRoundState(rand: () => number) {
+    this.matchedPairs = {};
+    this.matchedDescIds = new Set<string>();
+    this.selectedTermId = null;
+    const pairs = this.activeMatchRound?.pairs ?? [];
+    this.shuffledDescriptions = seededShuffle(rand, pairs);
+  }
+
   get currentQuestion(): Question | null {
-    if (!this.config?.questions) return null;
-    return this.config.questions[this.currentIndex] ?? null;
+    return this.activeQuestions[this.currentIndex] ?? null;
   }
 
   get totalQuestions(): number {
-    return this.config?.questions?.length ?? 0;
+    return this.activeQuestions.length;
+  }
+
+  get currentRound(): MatchRound | null {
+    return this.activeMatchRound;
   }
 
   asMyth(q: Question | null): MythQuestion {
@@ -182,12 +275,12 @@ export class GraphicQuiz implements OnInit {
     this.matchedDescIds.add(descId);
     this.selectedTermId = null;
 
-    const round = this.config?.matchRound;
+    const round = this.activeMatchRound;
     if (round && Object.keys(this.matchedPairs).length === round.pairs.length) {
       const allCorrect = round.pairs.every((p) => this.matchedPairs[p.id] === p.id);
       this.wasCorrect = allCorrect;
       if (allCorrect) this.score += 10 * round.pairs.length;
-      // Submit score and perform the same end-of-quiz flow as other quiz types
+
       this.stopTimer();
       this.finish();
       return;
@@ -204,7 +297,7 @@ export class GraphicQuiz implements OnInit {
   }
 
   matchColor(termId: string): string | null {
-    const round = this.config?.matchRound;
+    const round = this.activeMatchRound;
     if (!round) return null;
     const idx = round.pairs.findIndex((p) => p.id === termId);
     return this.matchColors[idx % this.matchColors.length];
@@ -247,8 +340,7 @@ export class GraphicQuiz implements OnInit {
   // timer helpers:
   private startTimerForCurrentQuestion() {
     this.stopTimer();
-    // only for myth/emoji questions
-    if (!this.config?.questions || !this.config.questions.length) return;
+    if (!this.activeQuestions.length) return;
     const q = this.currentQuestion;
     if (!q || (q as any).answered_at) return;
     this.timeLeft = this.timerSeconds;
@@ -286,17 +378,14 @@ export class GraphicQuiz implements OnInit {
 
   private onTimerExpiredForQuestion() {
     this.stopTimer();
-    // treat as incorrect/no-answer and mark answered to reveal fact
     this.answered = true;
     this.wasCorrect = false;
     this.cdr.detectChanges();
-    // optionally auto-move to next after a short delay:
     setTimeout(() => this.next(), 1500);
   }
 
   private onTimerExpiredForMatch() {
     this.stopTimer();
-    // end round as failed if not all matched
     this.wasCorrect = false;
     this.finish();
   }
@@ -313,5 +402,5 @@ export class GraphicQuiz implements OnInit {
       window.location.href = this.api.getTestContentUrl();
     }, 4000);
   }
-  
+
 }
