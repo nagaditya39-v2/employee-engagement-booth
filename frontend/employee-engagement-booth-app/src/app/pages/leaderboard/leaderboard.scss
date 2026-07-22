@@ -8,7 +8,18 @@
   padding: 3rem 2rem;
   font-family: var(--font-body);
   color: var(--text);
-  position: relative; z-index: 1; 
+  position: relative; z-index: 1;
+}
+
+.lb-brand {
+  margin-bottom: 1.5rem;
+  display: none; // hidden by default — landscape doesn't need it front-and-center
+
+  .lb-logo {
+    height: 28px;
+    width: auto;
+    opacity: 0.9;
+  }
 }
 
 .lb-header {
@@ -32,6 +43,9 @@
   }
 }
 
+/* Standings list — SAME structure/sizing in both orientations, on purpose.
+   Card layout does not change based on display type; only the surrounding
+   background/branding treatment adapts below. */
 .standings {
   width: 100%;
   max-width: 760px;
@@ -89,13 +103,8 @@
     .score { color: var(--gold); font-size: 1.55rem; }
   }
 
-  &.rank-2 {
-    border-color: rgba(91, 127, 255, 0.4);
-  }
-
-  &.rank-3 {
-    border-color: rgba(91, 127, 255, 0.25);
-  }
+  &.rank-2 { border-color: rgba(91, 127, 255, 0.4); }
+  &.rank-3 { border-color: rgba(91, 127, 255, 0.25); }
 }
 
 .status, .empty {
@@ -103,4 +112,34 @@
   margin-top: 2rem;
   font-family: var(--font-mono);
   font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   LANDSCAPE — 16:9 TV
+   Extra horizontal space goes to background breathing room, not the cards.
+   ========================================================================== */
+:host.mode-landscape {
+  .leaderboard-container { padding: 3rem 4rem; }
+}
+
+/* ==========================================================================
+   PORTRAIT — 9:16 standee
+   Cards/rows stay identical to landscape. What changes here is making the
+   brand mark and surrounding negative space fit the tall format — showing
+   the RR wordmark up top, and giving the mandala/turbine background photo
+   more vertical room to breathe above and below the standings block.
+   ========================================================================== */
+:host.mode-portrait {
+  .leaderboard-container {
+    padding: 4rem 2rem 3rem;
+    justify-content: center; // lets top/bottom background show more evenly
+  }
+
+  .lb-brand {
+    display: block; // show the logo — anchors the tall layout
+  }
+
+  .lb-header {
+    margin-bottom: 3rem; // more vertical air before the list starts
+  }
 }
