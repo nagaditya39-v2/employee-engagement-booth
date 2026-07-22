@@ -15,7 +15,8 @@ interface MythQuestion {
 interface EmojiQuestion {
   type: 'emoji';
   emojis: string[];
-  answer: string;
+  answer: string;        // primary answer, shown when they get it wrong
+  acceptedAnswers?: string[]; // optional additional valid answers (aliases)
   hint: string;
 }
 
@@ -48,6 +49,73 @@ interface CardQuizConfig {
 
 // How many questions/pairs a locked draw contains for any card-quiz type.
 const CARD_QUIZ_DRAW_COUNT = 5;
+
+// ---- Fuzzy answer matching ---------------------------------------------
+// Kiosk users type fast and make typos, and some answers have common
+// aliases (e.g. "AI" for "Artificial Intelligence"). Exact string equality
+// is too strict for a touch/keyboard kiosk flow, so we normalize + allow
+// near-matches within an edit-distance threshold that scales with answer
+// length (a 4-letter answer can't absorb the same typo budget as a
+// 20-letter one).
+
+function normalizeAnswer(str: string): string {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s]/g, '')   // strip punctuation (hyphens, parens, etc.)
+    .replace(/\s+/g, ' ');     // collapse repeated whitespace
+}
+
+// Standard Levenshtein edit distance (insertions/deletions/substitutions).
+function levenshtein(a: string, b: string): number {
+  const m = a.length;
+  const n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+
+  const prev = new Array(n + 1);
+  const curr = new Array(n + 1);
+  for (let j = 0; j <= n; j++) prev[j] = j;
+
+  for (let i = 1; i <= m; i++) {
+    curr[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      curr[j] = Math.min(
+        curr[j - 1] + 1,      // insertion
+        prev[j] + 1,          // deletion
+        prev[j - 1] + cost    // substitution
+      );
+    }
+    for (let j = 0; j <= n; j++) prev[j] = curr[j];
+  }
+  return prev[n];
+}
+
+// Allowed typo budget scales with answer length: short answers ("AI",
+// "X") need near-exact matches, longer answers ("Large Language Model")
+// can tolerate a couple of typos without accepting a wrong guess.
+function maxEditDistanceFor(length: number): number {
+  if (length <= 3) return 0;
+  return Math.max(1, Math.floor(length * 0.2)); // allow ~20% of characters to be "wrong"
+}
+
+function isFuzzyMatch(input: string, candidate: string): boolean {
+  const a = normalizeAnswer(input);
+  const b = normalizeAnswer(candidate);
+  if (!a) return false;
+  if (a === b) return true;
+
+  const distance = levenshtein(a, b);
+  return distance <= maxEditDistanceFor(b.length);
+}
+
+// Checks the user's input against the primary answer plus any aliases.
+function matchesAnyAnswer(input: string, q: EmojiQuestion): boolean {
+  const candidates = [q.answer, ...(q.acceptedAnswers ?? [])];
+  return candidates.some((c) => isFuzzyMatch(input, c));
+}
+// -------------------------------------------------------------------------
 
 // ---- Deterministic seeded RNG helpers ----------------------------------
 // Same (userId, contentId, quizType) always produces the same seed, so the
@@ -258,9 +326,7 @@ export class GraphicQuiz implements OnInit {
   submitEmojiAnswer() {
     if (this.answered || !this.emojiInput.trim()) return;
     const q = this.asEmoji(this.currentQuestion);
-    const normalizedEntry = this.normalizeAnswer(this.emojiInput);
-    const normalizedAnswer = this.normalizeAnswer(q.answer);
-    this.wasCorrect = normalizedEntry === normalizedAnswer;
+    this.wasCorrect = matchesAnyAnswer(this.emojiInput, q);
     if (this.wasCorrect) this.score += 10;
     this.answered = true;
     this.stopTimer();
