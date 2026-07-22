@@ -2,9 +2,8 @@
   {
     "id": "ai-basics",
     "title": "What Is Generative AI?",
-    "videoFile": "",
-    "description": "A quick primer on how generative AI models learn and create content.",
-    "comingSoon": true
+    "videoFile": "gen-ai.mp4",
+    "description": "A quick primer on how generative AI models learn and create content."
   },
   {
     "id": "cybersecurity",
@@ -13,25 +12,10 @@
     "description": "The CIA triad, vulnerabilities vs. threats, DOS attacks, and everyday digital hygiene."
   },
   {
-    "id": "sustainability",
-    "title": "Sustainability at Work",
-    "videoFile": "",
-    "description": "Small daily choices that add up to a big environmental impact.",
-    "comingSoon": true
-  },
-  {
-    "id": "innovation",
-    "title": "Innovation Mindset",
-    "videoFile": "",
-    "description": "How great ideas move from a napkin sketch to reality.",
-    "comingSoon": true
-  },
-  {
-    "id": "teamwork",
-    "title": "The Power of Teamwork",
-    "videoFile": "",
-    "description": "Why diverse teams solve problems faster and better.",
-    "comingSoon": true
+    "id": "prompt-engineering",
+    "title": "Prompt Engineering",
+    "videoFile": "prompt-engineering.mp4",
+    "description": "How to craft effective prompts for interacting with generative AI models."
   },
   {
     "id": "rag",
@@ -46,10 +30,9 @@
     "description": "Forward vs. reverse proxies, caching, and inspecting traffic in transit."
   },
   {
-    "id": "coming-soon-1",
-    "title": "Coming Soon",
-    "videoFile": "",
-    "description": "A new topic is on the way — check back soon.",
-    "comingSoon": true
+    "id": "nlp",
+    "title": "Natural Language Processing (NLP)",
+    "videoFile": "nlp.mp4",
+    "description": "An introduction to the field of NLP and its applications."
   }
 ]
