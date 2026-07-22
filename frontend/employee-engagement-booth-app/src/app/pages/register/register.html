@@ -9,11 +9,30 @@
     <p class="subtitle">Just your name — we'll generate your ID and QR code next.</p>
 
     <div class="form-section">
-      <input [(ngModel)]="name" placeholder="Your name" autocomplete="off" (keyup.enter)="register()" />
-      <button class="btn-primary" (click)="register()">Register</button>
+      <input [(ngModel)]="name" placeholder="Your name" autocomplete="off" type="text" (keyup.enter)="showAcknowledgement()"/>
+      <button class="btn-primary" (click)="showAcknowledgement()">Register</button>
     </div>
 
     <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
     <p class="switch-link">Already registered? <a (click)="goToResume()">Resume session</a></p>
+  </div>
+
+  <!-- Acknowledgement Popup -->
+
+  <div class="overlay" *ngIf="showPopup">
+    <div class="ack-popup">
+      <h2>Photography & Conduct Notice</h2>
+
+      <p>Official event photographs and videos may be captured during this event and may be used by the company for internal communications.</p>
+
+      <p>Photography or videography by participants within the site premises is strictly prohibited.</p>
+
+      <p>By continuing, you acknowledge that you have read and understood this notice.</p>
+      
+      <div class="popup-actions">
+        <button class="btn-secondary" (click)="showPopup = false">Back</button>
+        <button class="btn-primary" (click)="register()">I Understand & Continue</button>
+      </div>
+    </div>
   </div>
 </div>

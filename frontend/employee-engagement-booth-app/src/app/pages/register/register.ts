@@ -15,14 +15,13 @@ import { BrandHeader } from '../../shared/brand-header/brand-header';
 export class Register {
   name: string = '';
   errorMessage: string = '';
+  showPopup = false;
 
   constructor(private api: Api, private router: Router) {}
 
   register() {
-    if (!this.name.trim()) {
-      this.errorMessage = 'Please enter your name.';
-      return;
-    }
+    this.showPopup = false;
+
     this.api.register(this.name.trim()).subscribe({
       next: (user: any) => {
         this.router.navigate(['/qr', user.id, user.qr_code]);
@@ -31,6 +30,16 @@ export class Register {
         this.errorMessage = 'Registration failed. Please try again.';
       }
     });
+  }
+
+  showAcknowledgement() {
+    if (!this.name.trim()) {
+      this.errorMessage = 'Please enter your name.';
+      return;
+    }
+
+    this.errorMessage = '';
+    this.showPopup = true;
   }
 
   goToResume() {

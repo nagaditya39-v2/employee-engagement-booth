@@ -54,7 +54,7 @@ h1 {
   width: 320px;
   margin-top: 0.5rem;
 
-  input {
+  input[type="text"] {
     padding: 0.85rem 1rem;
     font-size: 1rem;
     background: var(--surface);
@@ -110,4 +110,64 @@ h1 {
     text-decoration: none;
     &:hover { text-decoration: underline; }
   }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 10, 35, 0.5);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.ack-popup {
+  width: 520px;
+  max-width: 90vw;
+  background: #001e68;
+  border: 1px solid #002f90;
+  border-radius: 18px;
+  padding: 30px;
+  color: #fff;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, .45);
+}
+
+.ack-popup h2 {
+  margin: 0 0 18px;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.ack-popup p {
+  color: rgba(255,255,255,.82);
+  line-height: 1.7;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.popup-actions {
+  margin-top: 28px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.btn-secondary {
+  padding: 0.85rem 1.6rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,.15);
+  border-color: rgba(255,255,255,.4);
 }
