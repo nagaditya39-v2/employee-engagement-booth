@@ -13,7 +13,12 @@
     height: 22px;
     width: auto;
   }
+}
 
+.brand-header__logo {
+  background: transparent;
+  display: block;
+  object-fit: contain;
 }
 
 @media (max-width: 640px) {
