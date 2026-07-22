@@ -14,10 +14,10 @@ type DisplayMode = 'portrait' | 'landscape';
 })
 export class Leaderboard implements OnInit, OnDestroy {
   standings: { id: number; name: string; score: number }[] = [];
-  private socket!: WebSocket;
+  private socket: WebSocket | null = null;
   connected = false;
+  private pollTimer: number | null = null;
 
-  // Drives layout — bound to a class on the host element
   mode: DisplayMode = 'landscape';
 
   @HostBinding('class.mode-portrait') get isPortrait() { return this.mode === 'portrait'; }
@@ -37,10 +37,6 @@ export class Leaderboard implements OnInit, OnDestroy {
     this.connect();
   }
 
-  // Priority: explicit ?layout=portrait|landscape query param (set once per
-  // display at setup time) > automatic aspect-ratio detection as a fallback.
-  // Explicit is safer for kiosk hardware since screen dimensions can be
-  // reported oddly depending on the device/browser combo.
   private applyModeFromQueryParamOrDetect() {
     const forced = this.route.snapshot.queryParamMap.get('layout');
     if (forced === 'portrait' || forced === 'landscape') {
@@ -59,6 +55,8 @@ export class Leaderboard implements OnInit, OnDestroy {
   }
 
   connect() {
+    this.closeSocket();
+
     const wsUrl = API_BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://') + '/ws/leaderboard';
     this.socket = new WebSocket(wsUrl);
 
@@ -71,8 +69,11 @@ export class Leaderboard implements OnInit, OnDestroy {
 
     this.socket.onmessage = (event) => {
       this.zone.run(() => {
-        this.standings = JSON.parse(event.data);
-        this.cdr.detectChanges();
+        const standings = this.parseStandings(event.data);
+        if (standings) {
+          this.standings = standings;
+          this.cdr.detectChanges();
+        }
       });
     };
 
@@ -80,17 +81,84 @@ export class Leaderboard implements OnInit, OnDestroy {
       this.zone.run(() => {
         this.connected = false;
         this.cdr.detectChanges();
-        setTimeout(() => this.connect(), 3000);
       });
+      this.startPolling();
     };
 
     this.socket.onerror = () => {
-      this.socket.close();
+      this.socket?.close();
     };
+
+    this.startPolling();
+  }
+
+  private parseStandings(data: string | MessageEvent['data']) {
+    try {
+      const parsed = JSON.parse(typeof data === 'string' ? data : String(data));
+      return Array.isArray(parsed) ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private startPolling() {
+    if (this.pollTimer !== null) {
+      return;
+    }
+
+    this.loadStandingsFromApi();
+    this.pollTimer = window.setInterval(() => {
+      this.loadStandingsFromApi();
+    }, 5000);
+  }
+
+  private stopPolling() {
+    if (this.pollTimer !== null) {
+      clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
+  }
+
+  private loadStandingsFromApi() {
+    fetch(`${API_BASE_URL}/leaderboard/standings`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Leaderboard request failed: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((payload) => {
+        const standings = this.parseStandings(JSON.stringify(payload));
+        if (standings) {
+          this.zone.run(() => {
+            this.standings = standings;
+            this.connected = true;
+            this.cdr.detectChanges();
+          });
+        }
+      })
+      .catch(() => {
+        this.zone.run(() => {
+          this.connected = false;
+          this.cdr.detectChanges();
+        });
+      });
+  }
+
+  private closeSocket() {
+    if (this.socket) {
+      this.socket.onopen = null;
+      this.socket.onmessage = null;
+      this.socket.onclose = null;
+      this.socket.onerror = null;
+      this.socket.close();
+      this.socket = null;
+    }
   }
 
   ngOnDestroy() {
     window.removeEventListener('resize', this.resizeHandler);
-    this.socket.close();
+    this.stopPolling();
+    this.closeSocket();
   }
 }

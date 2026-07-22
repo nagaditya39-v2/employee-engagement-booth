@@ -13,6 +13,12 @@ import uuid, qrcode, io, random, models, schemas, os, logging
 from database import get_db
 from config import HOST_URL
 
+
+def get_standings(db):
+    users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
+    return [{"id": u.id, "name": u.name, "score": u.total_score} for u in users]
+
+
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -73,8 +79,7 @@ manager = ConnectionManager()
 async def leaderboard_ws(websocket: WebSocket, db: Session = Depends(get_db)):
     await manager.connect(websocket)
     try:
-        users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
-        standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in users]
+        standings = get_standings(db)
         await websocket.send_json(standings)
         logger.info(f"Leaderboard WS connected: {websocket.client}")
         while True:
@@ -90,6 +95,11 @@ async def leaderboard_ws(websocket: WebSocket, db: Session = Depends(get_db)):
             manager.disconnect(websocket)
         except Exception:
             pass
+
+@app.get("/leaderboard/standings")
+def get_leaderboard_standings(db: Session = Depends(get_db)):
+    return get_standings(db)
+
 
 @app.post("/register", response_model=schemas.UserOut)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -466,8 +476,7 @@ async def submit_quiz(user_id: int, content_id: int, db: Session = Depends(get_d
     db.commit()
 
     # Broadcast updated standings to leaderboard
-    all_users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
-    standings = [{"id": u.id, "name": u.name, "score": u.total_score} for u in all_users]
+    standings = get_standings(db)
     try:
         await manager.broadcast(standings)
     except Exception:
@@ -558,6 +567,14 @@ def get_user_stats(user_id: int, db: Session = Depends(get_db)):
         rank=rank,
         total_users=len(all_users)
     )
+
+def get_standings(db):
+    users = db.query(models.Users).order_by(models.Users.total_score.desc()).all()
+    return [{"id": u.id, "name": u.name, "score": u.total_score} for u in users]
+
+@app.get("/leaderboard/standings")
+def get_leaderboard_standings(db: Session = Depends(get_db)):
+    return get_standings(db)
 
 
 # ---------catch-all here at the bottom 

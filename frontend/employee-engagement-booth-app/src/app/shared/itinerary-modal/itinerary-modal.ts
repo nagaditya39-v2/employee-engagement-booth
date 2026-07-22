@@ -25,18 +25,18 @@ export class ItineraryModal {
   scheduleItems: ScheduleItem[] = [
     {
       icon: '🖥️',
-      title: 'Effective Communication',
-      description: 'Enhance your communication skills in the workplace.',
-      time: '09:30 AM – 10:30 AM',
-      room: 'Innovation Hub',
+      title: 'The Anatomy of a Shop Visit: Managing Costs, Invoicing & Data Availability',
+      description: 'Alok Kumar',
+      time: '11:20 AM - 11:40 AM',
+      room: 'Bekal - Room 9',
       status: 'upcoming',
     },
     {
       icon: '👥',
-      title: 'Leadership in Action',
-      description: 'Practical strategies for impactful leadership.',
-      time: '11:00 AM – 12:00 PM',
-      room: 'Engine Room',
+      title: 'Power Automate: Automate, Innovate, Elevate - Stop Repeating. Start Automating',
+      description: 'Yashawini Velraj / Nivas G E',
+      time: '11:50 AM - 12:10 PM',
+      room: 'Ellora - Room 10',
       status: 'upcoming',
     },
   ];
