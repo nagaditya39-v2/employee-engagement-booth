@@ -5,11 +5,12 @@ import { CommonModule } from '@angular/common';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Api } from '../../services/api';
 import { BrandHeader } from '../../shared/brand-header/brand-header';
+import { ItineraryModal } from '../../shared/itinerary-modal/itinerary-modal';
 
 @Component({
   selector: 'app-resume',
   standalone: true,
-  imports: [CommonModule, FormsModule, BrandHeader],
+  imports: [CommonModule, FormsModule, BrandHeader, ItineraryModal],
   templateUrl: './resume.html',
   styleUrl: './resume.scss'
 })
@@ -21,6 +22,10 @@ export class Resume implements OnDestroy {
   scannerStarting: boolean = false;
   private html5QrCode: Html5Qrcode | null = null;
   private readonly SCANNER_ELEMENT_ID = 'qr-reader';
+
+  showItinerary = false;
+  openItinerary() { this.showItinerary = true; }
+  closeItinerary() { this.showItinerary = false; }
 
   constructor(
     private api: Api,

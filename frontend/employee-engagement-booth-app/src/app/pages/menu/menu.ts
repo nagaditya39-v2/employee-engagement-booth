@@ -3,11 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Api } from '../../services/api';
 import { DISPLAY_CONFIG } from '../../screen_config';
+import { ItineraryModal } from '../../shared/itinerary-modal/itinerary-modal';
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ItineraryModal],
   templateUrl: './menu.html',
   styleUrl: './menu.scss'
 })
@@ -24,6 +25,10 @@ export class Menu implements OnInit, OnDestroy {
   // final state after completing all stuff
   contentLoaded = false;
   progressLoaded = false;
+  showItinerary = false;
+
+  openItinerary() { this.showItinerary = true; }
+  closeItinerary() { this.showItinerary = false; }
 
   private messageHandler = (event: MessageEvent) => this.handleSecondScreenMessage(event);
 

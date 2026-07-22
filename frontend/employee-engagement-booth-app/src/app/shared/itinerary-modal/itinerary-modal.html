@@ -1,0 +1,30 @@
+<div class="itinerary-backdrop" *ngIf="open" (click)="onBackdropClick($event)">
+  <div class="itinerary-modal bracket-frame">
+    <button class="close-btn" (click)="close()" aria-label="Close">✕</button>
+
+    <div class="modal-header">
+      <p class="eyebrow">YOUR ITINERARY</p>
+      <h2>Workshop Schedule</h2>
+      <p class="subtitle">Plan your session and make the most of your day.</p>
+    </div>
+
+    <div class="schedule-list">
+      <div class="schedule-item" *ngFor="let item of scheduleItems">
+        <div class="item-icon">{{ item.icon }}</div>
+        <div class="item-main">
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        </div>
+        <div class="item-time">
+          <span class="label">TIME</span>
+          <span class="value">{{ item.time }}</span>
+        </div>
+        <div class="item-room">
+          <span class="label">ROOM</span>
+          <span class="value">{{ item.room }}</span>
+        </div>
+        <div class="status-dot" [class.status-live]="item.status === 'live'"></div>
+      </div>
+    </div>
+  </div>
+</div>

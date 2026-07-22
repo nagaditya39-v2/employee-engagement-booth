@@ -16,8 +16,9 @@
         </div>
       </div>
 
-      <div class="launch-bar" *ngIf="!contentWindow || contentWindow.closed">
-        <button (click)="launchContentWindow()">🖥 Launch display window</button>
+      <div class="launch-bar">
+        <button (click)="openItinerary()">View schedule</button>
+        <button (click)="launchContentWindow()" *ngIf="!contentWindow || contentWindow.closed">🖥 Launch display window</button>
       </div>
 
       <div class="content-grid">
@@ -57,6 +58,8 @@
 
         </div>
       </div>
+
+      <app-itinerary-modal [open]="showItinerary" (closed)="closeItinerary()"></app-itinerary-modal>
       
     </div>
 
