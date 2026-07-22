@@ -136,6 +136,78 @@ TOPIC_QUESTIONS = {
         ("What type of models do modern NLP systems rely on to recognize patterns and understand context?",
          "Simple rule-based algorithms", "Transformer-based language models", "Relational database models", "Linear regression models", "b"),
     ],
+    "deep-learning": [
+    ("How does deep learning differ from traditional machine learning regarding feature extraction?",
+     "Deep learning relies entirely on hand-crafted feature engineering",
+     "Deep learning models automatically discover useful feature representations from raw data",
+     "Traditional machine learning eliminates the need for any hand-tuning of parameters",
+     "Deep learning only works with data that has been manually labeled for features",
+     "b"),
+
+    ("What does the term 'deep' in deep learning specifically refer to?",
+     "The complexity of the mathematical algorithms used",
+     "The number of layers through which data is transformed in a network",
+     "The depth of the hardware storage required to save the model",
+     "The level of biological accuracy compared to the human brain",
+     "b"),
+
+    ("According to most researchers, what is the minimum Credit Assignment Path (CAP) depth for a system to be considered 'deep learning'?",
+     "A depth higher than one",
+     "A depth higher than two",
+     "A depth of at least ten",
+     "A depth of at least one hundred",
+     "b"),
+
+    ("Which hardware advancement is credited with fueling the 'deep learning revolution' in computer vision?",
+     "Multi-core CPUs",
+     "Quantum processors",
+     "Graphics Processing Units (GPUs)",
+     "High-capacity magnetic tape storage",
+     "c"),
+
+    ("What is the 'degradation' problem encountered in very deep neural networks?",
+     "The physical wearing out of the processing hardware",
+     "A reduction in training accuracy when too many layers are added to a network",
+     "The tendency of a model to lose its ability to recognize basic shapes",
+     "The loss of data as it passes through more than ten layers",
+     "b"),
+
+    ("Which architecture became the first Recurrent Neural Network (RNN) to win a pattern recognition contest in 2009?",
+     "Convolutional Neural Network (CNN)",
+     "Deep Belief Network (DBN)",
+     "Long Short-Term Memory (LSTM)",
+     "AlexNet",
+     "c"),
+
+    ("Why is deep learning often criticized as being a 'black box'?",
+     "Because the models are kept in secret, proprietary databases",
+     "Because results are often confirmed empirically without a clear underlying theory explaining how they were reached",
+     "Because the models can only process data in dark, high-contrast environments",
+     "Because it is impossible to see the mathematical weights inside the layers",
+     "b"),
+
+    ("Which 2012 event demonstrated deep learning's superiority over shallow machine learning by a significant margin?",
+     "The Atari video game challenge",
+     "The ImageNet competition won by AlexNet",
+     "The first successful facial recognition of a human",
+     "The deployment of Google Translate",
+     "b"),
+
+    ("What issue occurs when a network models rare dependencies in training data, making it hard to generalize to new data?",
+     "Underfitting",
+     "Vanishing gradient",
+     "Overfitting",
+     "Dataset poisoning",
+     "c"),
+
+    ("What was the first major industrial application of deep learning?",
+     "Automatic tagging of pictures on Facebook",
+     "The Nuance Verifier for speaker recognition",
+     "Google DeepMind's AlphaGo",
+     "Self-driving cars in 360° camera views",
+     "b")
+    ]
+
 }
 
 for topic_key, questions in TOPIC_QUESTIONS.items():

@@ -34,5 +34,11 @@
     "title": "Natural Language Processing (NLP)",
     "videoFile": "nlp.mp4",
     "description": "An introduction to the field of NLP and its applications."
+  },
+  {
+    "id": "deep-learning",
+    "title": "Deep Learning",
+    "videoFile": "deep-learning.mp4",
+    "description": "An introduction to the field of deep learning and its applications."
   }
 ]
