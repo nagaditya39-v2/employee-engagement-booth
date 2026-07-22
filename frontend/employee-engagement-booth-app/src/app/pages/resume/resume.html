@@ -24,6 +24,6 @@
     <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
     <p class="switch-link">First time here? <a (click)="goToRegister()">Sign up</a></p>
     <button class="btn-secondary" (click)="openItinerary()">View workshop schedule</button>
-
-    <app-itinerary-modal [open]="showItinerary" (closed)="closeItinerary()"></app-itinerary-modal>
 </div>
+
+<app-itinerary-modal [open]="showItinerary" (closed)="closeItinerary()"></app-itinerary-modal>
