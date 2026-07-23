@@ -17,6 +17,7 @@
       </div>
 
       <div class="launch-bar">
+        <button (click)="goBackToResume()">← Back to resume</button>
         <button (click)="openItinerary()">View schedule</button>
         <button (click)="launchContentWindow()" *ngIf="!contentWindow || contentWindow.closed">🖥 Launch display window</button>
       </div>

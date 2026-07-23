@@ -176,4 +176,8 @@ export class Menu implements OnInit, OnDestroy {
   completedCount(): number {
     return Object.values(this.progressMap).filter(s => s === 'quiz_completed').length;
   }
+
+  goBackToResume() {
+    this.router.navigate(['/resume']);
+  }
 }

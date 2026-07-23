@@ -69,8 +69,15 @@
 /* Launch bar */
 .launch-bar {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   justify-content: flex-end;
   margin-bottom: 1.75rem;
+
+  button:first-child {
+    margin-right: auto;
+  }
 
   button {
     display: inline-flex;
